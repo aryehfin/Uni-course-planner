@@ -14,4 +14,4 @@ git push
 
 echo.
 echo Sync complete! Closing in 3 seconds...
-timeout /t 3 >nul
+
