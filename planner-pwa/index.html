@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Semester planner</title>
+<meta name="theme-color" content="#0b3954"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" type="image/png" sizes="192x192" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Classes">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#eef2f6;--card:#fff;--tx:#12263a;--mu:#5b6f82;--ln:#dbe3ea;--ac:#0b3954;--on:#fff;--soft:#e4edf4;--bad:#c8372d;--badbg:#fdeceb;--good:#2e9e6b;--gold:#e0a800;
+--f1:"Bricolage Grotesque","Avenir Next","Segoe UI",system-ui,sans-serif;--f2:"Figtree","Segoe UI",system-ui,-apple-system,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1923;--card:#16252f;--tx:#e8eef4;--mu:#93a6b7;--ln:#2a3d4f;--ac:#8cc7ee;--on:#0b2233;--soft:#203545;--bad:#ff7a6e;--badbg:#3a2220;--good:#4cc38a;--gold:#f0c23a}}
+:root[data-theme="dark"]{--bg:#0e1923;--card:#16252f;--tx:#e8eef4;--mu:#93a6b7;--ln:#2a3d4f;--ac:#8cc7ee;--on:#0b2233;--soft:#203545;--bad:#ff7a6e;--badbg:#3a2220;--good:#4cc38a;--gold:#f0c23a}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}*{box-sizing:border-box}[hidden]{display:none!important}
+body{margin:0 auto;background:var(--bg);color:var(--tx);font:15px/1.45 var(--f2);padding:12px 14px 92px;max-width:1100px;-webkit-text-size-adjust:100%}
+:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.top{padding:6px 2px 2px}h1{font:700 22px/1.1 var(--f1);margin:0;letter-spacing:-.01em}
+h2{font:700 17px/1.2 var(--f1);margin:0 0 10px;letter-spacing:-.005em}.sub{color:var(--mu);font-size:13px;margin-bottom:10px}
+.card{background:var(--card);border:1px solid var(--ln);border-radius:16px;padding:16px;margin-bottom:14px}
+#status{padding:12px 14px;border-radius:12px;font-size:14px;margin-bottom:14px;box-shadow:inset 4px 0 0 var(--good)}
+.ok{background:color-mix(in srgb,var(--good) 12%,var(--card))}.bad{background:var(--badbg);color:var(--bad);box-shadow:inset 4px 0 0 var(--bad)!important}.warn{background:color-mix(in srgb,var(--gold) 16%,var(--card));box-shadow:inset 4px 0 0 var(--gold)}
+select,input,textarea,button{font:inherit;color:var(--tx);background:var(--card);border:1px solid var(--ln);border-radius:10px;padding:6px 9px}
+input[type=checkbox]{width:20px;height:20px;accent-color:var(--ac)}button{cursor:pointer}
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;gap:4px;padding:6px 10px calc(6px + env(safe-area-inset-bottom,0px));background:#0b3954;border-top:0}
+.nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;border:0;background:none;color:rgba(255,255,255,.7);font-size:12px;font-weight:600;padding:7px 4px;border-radius:12px;min-height:52px}
+.nav button.on{background:rgba(255,255,255,.16);color:#fff}
+#v_today,#v_set{max-width:640px;margin:0 auto}
+.tabs,.views{display:flex;gap:6px;margin:10px 0 12px;flex-wrap:wrap;align-items:center}.views span{color:var(--mu);font-size:13px}
+.tab,.vb{border-radius:99px;padding:8px 16px;font-weight:600}.tab.on{background:var(--ac);color:var(--on);border-color:var(--ac)}.vb{padding:6px 14px}.vb.on{background:var(--tx);color:var(--bg);border-color:var(--tx)}
+.course{display:grid;grid-template-columns:auto 1fr auto 64px auto auto auto auto;gap:8px;align-items:center;padding:10px 0;border-top:1px solid var(--ln)}
+.course.wk{grid-template-columns:auto 1fr auto 64px auto}.course:first-of-type{border-top:0}
+.course.fl{background:var(--badbg);margin:0 -8px;padding-left:8px;padding-right:8px;border-radius:10px}
+.course .n{font-weight:600}.course .m{color:var(--mu);font-size:12px;margin-top:2px}.course input[type=number]{width:64px}
+.btns{display:flex;gap:2px}button.x{border:0;background:none;color:var(--mu);font-size:18px;padding:4px 7px;min-width:34px;min-height:34px}
+.tag{font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;margin-right:6px;vertical-align:1px;background:rgba(120,130,140,.18);background:color-mix(in srgb,var(--tc) 16%,transparent);color:color-mix(in srgb,var(--tc) 68%,var(--tx));white-space:nowrap}
+.chips{display:flex;flex-wrap:wrap;gap:8px}.chip{padding:7px 12px;border-radius:99px;font-size:13px;border:1px solid var(--ln)}
+.chip.good{background:color-mix(in srgb,var(--good) 13%,var(--card));border-color:color-mix(in srgb,var(--good) 45%,transparent)}.chip.clash{background:var(--badbg);color:var(--bad);border-color:var(--bad)}.chip.na{color:var(--mu)}
+.bar{height:12px;background:var(--soft);border-radius:99px;overflow:hidden;margin:10px 0}.bar i{display:block;height:100%;background:var(--ac);border-radius:99px}.bar.done i{background:var(--good)}
+.crow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.crow input{width:64px}.crow b{font:700 24px var(--f1)}
+.wsr{display:grid;grid-template-columns:120px 130px 1fr;gap:8px;padding:8px 0;border-top:1px solid var(--ln);font-size:13px}.wsr:first-of-type{border-top:0}.wsr.off{opacity:.55}
+@media (max-width:640px){.wsr{grid-template-columns:1fr}.course,.course.wk{display:flex;flex-wrap:wrap}.course>div:nth-child(2){flex:1 1 55%}.course .btns{order:1;margin-left:auto}.course select,.course input[type=number],.course input[type=time]{order:2;flex:1 1 84px}.course.fl{margin:0 -8px}}
+.scroll{overflow-x:auto}.grid{display:grid;grid-template-columns:44px repeat(6,minmax(130px,1fr));min-width:860px}
+.hd{font-weight:600;text-align:center;padding:8px 0;border-bottom:1px solid var(--ln);font-size:13px}.col{position:relative;border-left:1px solid var(--ln)}
+.hr{position:absolute;left:0;right:0;border-top:1px dashed var(--ln)}.lbl{font-size:11px;color:var(--mu);position:relative}
+.blk{position:absolute;border-radius:8px;padding:4px 7px;font-size:12px;overflow:hidden;color:#fff;border:2px solid transparent}
+.blk.c{border-color:var(--bad);box-shadow:0 0 0 2px var(--bad) inset}.blk b{display:block;font-size:12px}.blk.dim{opacity:.3}.blk.off{border:2px dashed rgba(255,255,255,.75);opacity:.6}.blk.nr{font-size:11px;padding:3px 5px}.blk.nr b{font-size:11px;line-height:1.2}
+.legend{font-size:12px;color:var(--mu);margin-bottom:10px;display:flex;gap:12px;flex-wrap:wrap}.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+.info{background:var(--bg);border:1px solid var(--ln);border-radius:12px;padding:12px;margin:2px 0 10px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
+.info label{font-size:12px;color:var(--mu);display:flex;flex-direction:column;gap:3px}.info .full{grid-column:1/-1}.info textarea{width:100%;min-height:70px;resize:vertical}.info input{width:100%}
+button.x.star{font-size:19px}button.x.star.on{color:var(--gold)}.chip.star{box-shadow:inset 0 0 0 1px var(--gold)}button.x.has{color:var(--ac);font-weight:700}
+.add{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}.add label{font-size:12px;color:var(--mu);display:flex;flex-direction:column;gap:3px}
+.add input,.add select,.add textarea{width:100%}.add .wide{grid-column:span 2}.prim,.add .prim{background:var(--ac);color:var(--on);border:0;padding:10px 16px;font-weight:600;border-radius:99px}.add .prim{align-self:end}
+.dirty{position:fixed;left:12px;right:12px;bottom:calc(68px + env(safe-area-inset-bottom,0px));z-index:19;display:flex;gap:10px;align-items:center;justify-content:space-between;background:var(--tx);color:var(--bg);padding:8px 8px 8px 16px;border-radius:99px;font-size:14px;font-weight:600;max-width:640px;margin:0 auto}.dirty .prim{padding:9px 16px}
+.card .ch{display:flex;align-items:center;gap:4px;margin-bottom:12px}.card .ch h2{margin:0;flex:1}
+.dg{border:0;background:none;color:var(--mu);cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;padding:6px;min-width:36px;min-height:40px;margin-left:-8px;display:flex;align-items:center;justify-content:center}
+.cv{border:0;background:none;color:var(--mu);min-width:40px;min-height:40px;padding:0;display:flex;align-items:center;justify-content:center}.cv svg{transition:transform .15s}
+.card.min .cb{display:none}.card.min .ch{margin-bottom:0}.card.min .cv svg{transform:rotate(-90deg)}
+.card.dragging{box-shadow:0 12px 32px rgba(0,0,0,.28);position:relative;z-index:6;border-color:var(--ac)}
+.secbar{display:flex;gap:8px;align-items:center;margin:0 0 12px;flex-wrap:wrap}.secbar button{padding:6px 14px;border-radius:99px}
+.hero{background:var(--ac);color:var(--on);border-radius:20px;padding:18px 20px;margin-bottom:12px}.hero .h1{font:700 30px/1.05 var(--f1);letter-spacing:-.02em}.hero .h2{font-size:16px;margin-top:4px;opacity:.85}.hero .hs{font-size:14px;margin-top:10px;font-weight:600}
+.dh{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}.dh input{min-height:44px;flex:1 1 130px}
+.grp{display:inline-flex;border:1px solid var(--ln);border-radius:99px;overflow:hidden;background:var(--card)}.grp button{border:0;border-radius:0;background:none;padding:0 15px;min-height:44px;font-weight:600}.grp button.on{background:var(--ac);color:var(--on)}
+.ev{display:grid;grid-template-columns:76px 1fr;gap:12px;background:var(--card);border:1px solid var(--ln);border-radius:16px;padding:14px 14px 14px 16px;margin-bottom:10px;box-shadow:inset 5px 0 0 var(--tc,var(--ac))}
+.ev.past{opacity:.5}.ev.cl{background:var(--badbg);border-color:color-mix(in srgb,var(--bad) 50%,transparent)}.ev.now{border-color:var(--good);box-shadow:inset 5px 0 0 var(--tc,var(--ac)),0 0 0 2px var(--good)}
+.tcol{font-family:var(--f1);text-align:left;font-variant-numeric:tabular-nums}.tcol .t1{font-size:20px;font-weight:700;line-height:1.1}.tcol .t1.ad{font-size:14px}.tcol small{font-size:11px;font-weight:600;margin-left:2px;color:var(--mu)}.tcol .t2{font-size:13px;color:var(--mu);margin-top:3px}
+.eb{min-width:0}.ev .nm{font-size:16px;font-weight:600;line-height:1.25}.ev .mt{color:var(--mu);font-size:13px;margin-top:4px}.ev .mt.bd{color:var(--bad);font-weight:600}
+.bdg{font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;color:#fff;vertical-align:2px;margin-left:4px}.bdg.now{background:var(--good)}.bdg.nxt{background:#2f6fb3}
+a.dir{display:inline-flex;align-items:center;gap:8px;margin-top:10px;padding:0 18px;min-height:44px;border-radius:99px;background:var(--ac);color:var(--on);text-decoration:none;font-weight:600}
+.ev details{margin-top:8px}.ev summary{cursor:pointer;color:var(--ac);font-size:13px;font-weight:600}
+.dayh{font:700 16px var(--f1);margin:18px 0 8px}.dayh.today{color:var(--ac)}.setl{display:block;margin-bottom:12px;font-size:13px;color:var(--mu)}.setl input,.setl select{width:100%;margin-top:4px;padding:10px;color:var(--tx);font-size:15px}
+</style></head><body>
+<header class="top"><h1>Semester planner</h1></header>
+<nav class="nav" id="nav"></nav>
+<div id="v_today"></div>
+<div id="v_set" hidden></div>
+<div id="v_plan" hidden>
+<div class="sub">Tick courses to consider. Overlaps turn red. Workshops (specific dates) are checked against weekly classes and each other.</div>
+<div class="tabs" id="tabs"></div>
+<div id="status"></div>
+<div class="views" id="views"></div>
+<div class="secbar"><span class="sub" style="margin:0">Sections:</span><button id="sec_col">Collapse all</button><button id="sec_exp">Expand all</button><span class="sub" style="margin:0">Drag the grip to reorder</span></div>
+<div id="secs">
+<div class="card" data-sec="cred"><h2>Elective credits</h2><div id="cred"></div></div>
+<div class="card" data-sec="chips"><h2>Electives at a glance</h2><div class="chips" id="chips"></div></div>
+<div class="card" data-sec="list"><h2>Courses</h2><div id="list"></div></div>
+<div class="card" data-sec="ws"><h2>Dated sessions</h2><div id="ws"></div></div>
+<div class="card" data-sec="wcal"><h2>Dated sessions calendar</h2><div class="sub">Clashing sessions sit side by side. Solid = selected, dashed = not selected (shown for reference only). Clashes are flagged only between selected courses. Selected weekly classes on the same weekday appear too.</div><label class="sub"><input type="checkbox" id="w_only"> Only show dates with a clash</label><div class="scroll"><div id="wcal"></div></div></div>
+<div class="card" data-sec="grid"><h2>Week view (weekly classes)</h2><div class="legend"><span><i style="background:#2f5fd0"></i>Mandatory</span><span><i style="background:#d9640f"></i>Elective</span><span><i style="background:#6b7280"></i>Untagged</span><span><i style="border:2px solid var(--bad)"></i>⚠ Conflict</span></div><div class="scroll"><div class="grid" id="grid"></div></div></div>
+<div class="card" data-sec="add"><h2>Add a course</h2>
+<div class="add">
+<label class="wide">Course name *<input id="a_name" placeholder="e.g. Corporate Finance"></label>
+<label>Course code<input id="a_code" placeholder="55xxx-x-01"></label>
+<label>Kind<select id="a_kind"><option value="C">Weekly class</option><option value="W">Specific dates (workshop or irregular class)</option></select></label>
+<label>Lecturer<input id="a_lec"></label><label>Building / room<input id="a_room"></label><label>Building for map link<input id="a_loc" placeholder="e.g. Business School Building 21"></label>
+<label>Type<select id="a_tag"><option value="M">Mandatory</option><option value="E">Elective</option><option value="">Untagged</option></select></label>
+<label>Credits<input id="a_cr" type="number" min="0" step="0.5" value="3"></label>
+<label>Semester<select id="a_sem"><option value="1">Semester 1</option><option value="2">Semester 2</option></select></label>
+<div id="f_week" style="display:contents"><label>Day<select id="a_day"></select></label><label>Start<input id="a_s" type="time" value="08:00"></label><label>End<input id="a_e" type="time" value="10:30"></label></div>
+<label class="wide" id="f_ws" hidden>Dates, one per line: DD-MM-YYYY or DD-MM-YYYY 3:30 PM-6:00 PM (no time = default time below, or all day)<textarea id="a_dates" rows="3" placeholder="15-04-2027 3:30 PM-9:00 PM&#10;16-04-2027 8:30 AM-2:00 PM"></textarea></label>
+<div id="f_wt" style="display:contents" hidden><label>Default start (optional)<input id="a_ds" type="time"></label><label>Default end (optional)<input id="a_de" type="time"></label></div>
+<label class="wide">Notes<input id="a_notes" placeholder="e.g. lesson, exercise, exam date"></label>
+<details style="grid-column:1/-1"><summary class="sub" style="cursor:pointer">More info (optional): description, topics, attendance, grading, reading, notes</summary><div class="info" id="a_info"></div></details>
+<button class="prim" id="a_btn">Add course</button></div>
+<div id="a_msg" class="sub" style="margin:8px 0 0"></div></div>
+</div>
+</div>
+<div class="dirty" id="dirty" hidden style="display:none"><span id="d_txt"></span><button class="prim" id="d_save">Save file</button></div>
+<script type="application/json" id="plannerData">{"cur":1,"s":{"1":[{"n":"International Business Strategy","c":"55971-3-01","s":"18:30","e":"21:00","r":"Michal Malinovitch · 21-21201","d":-1,"on":true,"t":"E","cr":3,"loc":"Business School Building 21"},{"n":"Intro to Financial Accounting","c":"55902-3-01","s":"18:30","e":"21:00","r":"Elyashiv Wiedman · 21-21305","d":-1,"on":true,"loc":"Business School Building 21"},{"n":"Biomedical Entrepreneurship","c":"55871-3-01","s":"18:00","e":"19:45","r":"Jacob Inbar · Goodman 2002","d":-1,"on":true,"loc":"Goodman Building"},{"n":"Business Strategy","c":"55821-3-01","s":"08:00","e":"10:30","r":"Samuel Meyers · 21-21201","d":-1,"on":true,"loc":"Business School Building 21"},{"n":"Quantitative Models","c":"55815-3-01","s":"11:00","e":"13:30","r":"Amir Brudner · 21-21205","d":-1,"on":true,"loc":"Business School Building 21"},{"n":"Generative Tools for Innovation & Entrepreneurship","c":"55708-1-01","s":"15:30","e":"18:00","r":"Sharon Arieli · 21-21203","d":-1,"on":true,"t":"E","cr":3,"loc":"Business School Building 21"},{"n":"Org. Behavior & Human Resource Mgmt","c":"55922-3-01","s":"15:30","e":"18:00","r":"Avital Baikovich · 22316","d":-1,"on":true,"loc":""},{"n":"Digital Health","c":"55783-1-01","s":"16:00","e":"17:45","r":"Inbal Mozes · Goodman 2004","d":-1,"on":true,"loc":"Goodman Building"},{"n":"The Workings of Entrepreneurship and Innovation","c":"55714","s":"08:00","e":"09:00","r":"","nt":"No day/time given: set them (⇄ moves it to the other semester)","d":-1,"t":"E","cr":3,"on":false,"loc":""},{"n":"Advance Marketing Strategy","c":"55994","s":"08:00","e":"09:00","r":"","nt":"No day/time given: set them (⇄ moves it to the other semester)","d":-1,"t":"E","cr":3,"on":false,"loc":""},{"n":"Catalyst: Gen-AI Reinforced Innovation Program","c":"55662","s":"08:00","e":"09:00","r":"","nt":"No day/time given: set them (⇄ moves it to the other semester)","d":-1,"t":"E","cr":6,"on":false,"loc":""},{"k":"W","n":"The Devil Wears Prada: Marketing Luxury Brands","c":"55648","r":"","nt":"Workshop","w":[{"x":"2026-11-19","s":"","e":""},{"x":"2026-11-20","s":"","e":""}],"t":"E","cr":1,"on":false,"loc":""},{"k":"W","n":"Principles, Financial Inclusion, Conflict Prevention and Abateme…","c":"55546","r":"","nt":"Workshop","w":[{"x":"2026-12-17","s":"15:30","e":"18:00"},{"x":"2026-12-18","s":"11:30","e":"14:00"},{"x":"2026-12-31","s":"15:30","e":"18:00"},{"x":"2027-01-01","s":"11:30","e":"14:00"}],"t":"E","cr":1,"on":false,"loc":""},{"k":"W","n":"Consumer Behaviour","c":"55978","r":"","nt":"Workshop","w":[{"x":"2026-12-17","s":"","e":""},{"x":"2026-12-18","s":"","e":""}],"t":"E","cr":1,"on":false,"loc":""}],"2":[{"n":"Introduction to Finance (lesson)","c":"55904-1-02","s":"08:30","e":"11:00","r":"Maya Haran Rosen · 21-21203","d":5,"on":true,"loc":"Business School Building 21"},{"n":"Introduction to Finance (exercise)","c":"55904-2-02","s":"21:00","e":"21:45","r":"Ron Hadad · 21-21203","d":3,"on":true,"loc":"Business School Building 21"},{"n":"Marketing Management","c":"55905-3-02","s":"11:30","e":"14:00","r":"Maayan Malter · 21-21305","d":5,"on":true,"loc":"Business School Building 21"},{"n":"Data Analysis for Decision Making","c":"55812-3-01","s":"15:30","e":"18:00","r":"Naomi Hausman · 21-21208","d":1,"on":true,"t":"E","cr":3,"loc":"Business School Building 21"},{"n":"Business Economics A' (Micro)","c":"55795-3-02","s":"15:30","e":"18:00","r":"Isaac Berthaus · 21-21303","d":3,"on":true,"loc":"Business School Building 21"},{"n":"Biomed Marketing","c":"55755-1-01","s":"16:00","e":"17:45","r":"Daphna Arbel · Goodman 2004","d":4,"on":true,"loc":"Goodman Building"},{"n":"Intro to VC World & Entrepreneurial Finance","c":"55824-1-01","s":"18:30","e":"21:00","r":"Saul Orbach · 21-21201","d":1,"on":true,"t":"E","cr":3,"loc":"Business School Building 21"},{"n":"Business Data and Technology - MBA","c":"55889-3-02","s":"18:30","e":"21:00","r":"Claudia Goldman-Shenhar · 21-21303","d":3,"on":true,"loc":"Business School Building 21"},{"n":"Final Project in Biomedical Entrepreneurship (BioInnovation B)","c":"55944-1-01","s":"18:00","e":"19:45","r":"Lawrence Aronhime, Tal Michaeli, Lior Shaltiel · Goodman 2004","d":4,"on":true,"loc":"Goodman Building"},{"k":"W","n":"Doing Business in a Global World: Israel in the World","c":"55653","r":"","nt":"Workshop","w":[{"x":"2027-04-15","s":"15:30","e":"21:00"},{"x":"2027-04-16","s":"08:30","e":"14:00"}],"t":"E","cr":1,"on":false,"loc":""},{"k":"W","n":"Communication Culture, Language and Personal Effectiveness in…","c":"55645","r":"","nt":"Workshop","w":[{"x":"2027-06-17","s":"","e":""},{"x":"2027-06-18","s":"","e":""}],"t":"E","cr":1,"on":false,"loc":""},{"k":"W","n":"Crowdfunding Workshop","c":"55657","r":"","nt":"Workshop","w":[{"x":"2027-04-01","s":"","e":""},{"x":"2027-04-02","s":"","e":""}],"t":"E","cr":1,"on":false,"loc":""},{"k":"W","n":"Creating High Impact Social Visual Content","c":"55649","r":"","nt":"Workshop","w":[{"x":"2027-05-06","s":"","e":""},{"x":"2027-05-07","s":"","e":""}],"t":"E","cr":1,"on":false,"loc":""},{"k":"W","n":"Marketing and AI","c":"55968","r":"","nt":"Workshop","w":[{"x":"2027-03-25","s":"","e":""},{"x":"2027-03-26","s":"","e":""}],"t":"E","cr":1,"on":false,"loc":""},{"k":"W","n":"Principles, Natural Disasters, Climate Change","c":"55547","r":"","nt":"Workshop","w":[{"x":"2027-05-20","s":"","e":""},{"x":"2027-05-21","s":"","e":""},{"x":"2027-05-25","s":"","e":""},{"x":"2027-05-28","s":"","e":""}],"t":"E","cr":1,"on":false,"loc":""}]},"goal":14,"sem":{"1":{"a":"2026-10-18","b":"2027-01-29"},"2":{"a":"2027-03-14","b":"2027-07-02"}},"nav":"today","campus":"","seed2":1,"seed3":1,"seed4":1}</script>
+<script>
+var SRC=document.documentElement.outerHTML;
+var DAYS=["Sun","Mon","Tue","Wed","Thu","Fri"],DN=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],MN=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+var TC={M:"#2f5fd0",E:"#d9640f","":"#6b7280"},TN={M:"Mandatory",E:"Elective","":"Untagged"};
+function f12(t){var p=(t||"").split(":"),h=+p[0];return ((h%12)||12)+":"+p[1]+" "+(h>=12?"PM":"AM")}
+function f12h(t){var p=(t||"").split(":"),h=+p[0];return ((h%12)||12)+":"+p[1]+"<small>"+(h>=12?"PM":"AM")+"</small>"}
+function r12(s,e){var a=+s.split(":")[0]>=12,b=+e.split(":")[0]>=12;return (a===b?f12(s).replace(/ [AP]M$/,""):f12(s))+"–"+f12(e)}
+function hl(t){var h=Math.floor(t/60)%24;return ((h%12)||12)+(h>=12?" PM":" AM")}
+function to24(t){var r=/^(\d{1,2}):(\d{2})\s*([ap]m)?$/i.exec((t||"").trim());if(!r)return t;var h=+r[1];if(r[3])h=h%12+(/p/i.test(r[3])?12:0);return ("0"+h).slice(-2)+":"+r[2]}
+function C(n,c,s,e,r,d){return{n:n,c:c,s:s,e:e,r:r,d:d,on:true}}
+var DEF=[C("International Business Strategy","55971-3-01","18:30","21:00","Michal Malinovitch · 21-21201",-1),C("Intro to Financial Accounting","55902-3-01","18:30","21:00","Elyashiv Wiedman · 21-21305",-1),C("Biomedical Entrepreneurship","55871-3-01","18:00","19:45","Jacob Inbar · Goodman 2002",-1),C("Business Strategy","55821-3-01","08:00","10:30","Samuel Meyers · 21-21201",-1),C("Quantitative Models","55815-3-01","11:00","13:30","Amir Brudner · 21-21205",-1),C("Generative Tools for Innovation & Entrepreneurship","55708-1-01","15:30","18:00","Sharon Arieli · 21-21203",-1),C("Org. Behavior & Human Resource Mgmt","55922-3-01","15:30","18:00","Avital Baikovich · 22316",-1),C("Digital Health","55783-1-01","16:00","17:45","Inbal Mozes · Goodman 2004",-1)];
+var DEF2=[C("Introduction to Finance (lesson)","55904-1-02","08:30","11:00","Maya Haran Rosen · 21-21203",5),C("Introduction to Finance (exercise)","55904-2-02","21:00","21:45","Ron Hadad · 21-21203",3),C("Marketing Management","55905-3-02","11:30","14:00","Maayan Malter · 21-21305",5),C("Data Analysis for Decision Making","55812-3-01","15:30","18:00","Naomi Hausman · 21-21208",1),C("Business Economics A' (Micro)","55795-3-02","15:30","18:00","Isaac Berthaus · 21-21303",3),C("Biomed Marketing","55755-1-01","16:00","17:45","Daphna Arbel · Goodman 2004",4),C("Intro to VC World & Entrepreneurial Finance","55824-1-01","18:30","21:00","Saul Orbach · 21-21201",1),C("Business Data and Technology - MBA","55889-3-02","18:30","21:00","Claudia Goldman-Shenhar · 21-21303",3),C("Final Project in Biomedical Entrepreneurship (BioInnovation B)","55944-1-01","18:00","19:45","Lawrence Aronhime, Tal Michaeli, Lior Shaltiel · Goodman 2004",4)];
+var CR={"55812":3,"55708":3,"55824":3,"55971":3,"55714":3,"55994":3,"55662":6};
+var BUS=[["55714","The Workings of Entrepreneurship and Innovation"],["55994","Advance Marketing Strategy"],["55662","Catalyst: Gen-AI Reinforced Innovation Program"]];
+var MINI=[[1,"55648","The Devil Wears Prada: Marketing Luxury Brands",["2026-11-19","2026-11-20"]],
+[1,"55546","Principles, Financial Inclusion, Conflict Prevention and Abateme…",["2026-12-17 15:30-18:00","2026-12-18 11:30-14:00","2026-12-31 15:30-18:00","2027-01-01 11:30-14:00"]],
+[1,"55978","Consumer Behaviour",["2026-12-17","2026-12-18"]],
+[2,"55653","Doing Business in a Global World: Israel in the World",["2027-04-15 15:30-21:00","2027-04-16 08:30-14:00"]],
+[2,"55645","Communication Culture, Language and Personal Effectiveness in…",["2027-06-17","2027-06-18"]],
+[2,"55657","Crowdfunding Workshop",["2027-04-01","2027-04-02"]],
+[2,"55649","Creating High Impact Social Visual Content",["2027-05-06","2027-05-07"]],
+[2,"55968","Marketing and AI",["2027-03-25","2027-03-26"]],
+[2,"55547","Principles, Natural Disasters, Climate Change",["2027-05-20","2027-05-21","2027-05-25","2027-05-28"]]];
+function parseS(t){var r=/^\s*(?:(\d{4})-(\d{2})-(\d{2})|(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{4}))(?:\s+(\d{1,2}:\d{2}\s*(?:[ap]m)?)\s*-\s*(\d{1,2}:\d{2}\s*(?:[ap]m)?))?\s*$/i.exec(t);if(!r)return null;
+var y=r[1]||r[6],mo=r[2]||r[5],d=r[3]||r[4];function p(n){return ("0"+n).slice(-2)}
+var x=y+"-"+p(mo)+"-"+p(d),dt=new Date(x+"T12:00:00");if(isNaN(dt)||dt.getMonth()+1!==+mo)return null;
+return {x:x,s:to24(r[7]||""),e:to24(r[8]||"")}}
+var state={cur:1,s:{1:DEF,2:[]},goal:14},dirty=false,migrated=false;
+try{var el0=document.getElementById("plannerData"),tx0=((el0&&el0.textContent)||"").trim(),emb=tx0?JSON.parse(tx0):null,pv=localStorage.getItem("plannerPWA");
+if(pv)state=JSON.parse(pv);else if(emb)state=emb}catch(e){}
+function norm(){if(!state.goal)state.goal=14;if(!state.layout)state.layout={order:[],col:{}};
+if(!state.sem)state.sem={1:{a:"2026-10-18",b:"2027-01-29"},2:{a:"2027-03-14",b:"2027-07-02"}};
+if(!state.nav)state.nav="today";if(state.campus==null)state.campus="";
+if(!state.seed2){if(!state.s[2]||!state.s[2].length)state.s[2]=DEF2;state.seed2=1}
+if(!state.seed3){
+[1,2].forEach(function(n){state.s[n].forEach(function(c){var k=(c.c||"").slice(0,5);if(CR[k]!=null){if(!c.t)c.t="E";if(c.cr==null)c.cr=CR[k]}})});
+var all=state.s[1].concat(state.s[2]);function has(k){return all.some(function(c){return (c.c||"").slice(0,5)===k})}
+BUS.forEach(function(b){if(!has(b[0]))state.s[1].push({n:b[1],c:b[0],s:"08:00",e:"09:00",r:"",nt:"No day/time given: set them (⇄ moves it to the other semester)",d:-1,t:"E",cr:CR[b[0]],on:false})});
+MINI.forEach(function(x){if(!has(x[1]))state.s[x[0]].push({k:"W",n:x[2],c:x[1],r:"",nt:"Workshop",w:x[3].map(parseS),t:"E",cr:1,on:false})});
+state.seed3=1}
+if(!state.seed4){[1,2].forEach(function(n){state.s[n].forEach(function(c){if(c.loc==null){var r=c.r||"";c.loc=/goodman/i.test(r)?"Goodman Building":/(^|[ ·])21-?\d/.test(r)?"Business School Building 21":""}})});state.seed4=1}
+}
+norm();
+var courses=state.s[state.cur]||state.s[1],view="all",wOnly=false;
+function save(){try{localStorage.setItem("plannerPWA",dataJson())}catch(e){}}
+function setSem(n){state.cur=n;courses=state.s[n];render()}
+function m(t){var p=t.split(":");return +p[0]*60+ +p[1]}
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function tg(c){return c.t==="M"||c.t==="E"?c.t:""}
+function star(c){return !!c.star&&tg(c)==="E"}
+function isW(c){return c.k==="W"}function ses(c){return c.w||[]}
+function wd(x){return new Date(x+"T12:00:00").getDay()}
+function fmt(x){var d=new Date(x+"T12:00:00");return DN[d.getDay()]+" "+d.getDate()+" "+MN[d.getMonth()]+" "+d.getFullYear()}
+function rng(x){return x.s?[m(x.s),m(x.e)]:[480,1260]}
+function ov(a,b){return a[0]<b[1]&&b[0]<a[1]}
+function vis(c){return view==="all"||(view==="S"?star(c):tg(c)===view)}
+function between(a,b){var r=[];
+if(!isW(a)&&!isW(b)){if(a.d>=0&&a.d===b.d&&ov([m(a.s),m(a.e)],[m(b.s),m(b.e)]))r.push(DAYS[a.d]);return r}
+if(isW(a)&&isW(b)){ses(a).forEach(function(x){ses(b).forEach(function(y){if(x.x===y.x&&ov(rng(x),rng(y)))r.push(fmt(x.x))})});return r}
+var w=isW(a)?a:b,k=isW(a)?b:a;if(k.d<0)return r;
+ses(w).forEach(function(x){if(wd(x.x)===k.d&&ov(rng(x),[m(k.s),m(k.e)]))r.push(fmt(x.x))});return r}
+function confl(c){return courses.filter(function(o){return o!==c&&o.on&&between(c,o).length})}
+function dayOpts(sel){return '<option value="-1"'+(sel<0?" selected":"")+'>Set day…</option>'+DAYS.map(function(d,i){return '<option value="'+i+'"'+(sel===i?" selected":"")+'>'+d+'</option>'}).join("")}
+document.getElementById("a_day").innerHTML=dayOpts(-1);
+var INF=[["desc","Course description",1],["topics","Topics / study program",1],["att","Attendance requirement"],["grade","Grade components"],["read","Required reading"],["notes","My notes",1]];
+function hasInf(c){return !!c.inf&&INF.some(function(f){return (c.inf[f[0]]||"").trim()})}
+document.getElementById("a_info").innerHTML=INF.map(function(f){return '<label'+(f[2]?' class="full"':'')+'>'+f[1]+'<textarea id="ai_'+f[0]+'"></textarea></label>'}).join("");
+function tagSel(c){return '<select data-f="t">'+["M","E",""].map(function(k){return '<option value="'+k+'"'+(tg(c)===k?" selected":"")+'>'+TN[k]+'</option>'}).join("")+'</select>'}
+function renderPlan(){
+var T=document.getElementById("tabs");T.innerHTML="";
+[1,2].forEach(function(n){var b=document.createElement("button");b.className="tab"+(state.cur===n?" on":"");b.textContent="Semester "+n+" ("+state.s[n].length+")";b.onclick=function(){setSem(n)};T.appendChild(b)});
+var V=document.getElementById("views");V.innerHTML="<span>Show:</span>";
+[["all","All"],["E","Electives"],["S","★ Starred"],["M","Mandatory"]].forEach(function(v){var b=document.createElement("button");b.className="vb"+(view===v[0]?" on":"");b.textContent=v[1];b.onclick=function(){view=v[0];render()};V.appendChild(b)});
+var act=[];courses.forEach(function(c,i){c.i=i;if(c.on)act.push(c)});
+var conf={},pairs=[];
+for(var i=0;i<act.length;i++)for(var j=i+1;j<act.length;j++){var b=between(act[i],act[j]);if(b.length){conf[act[i].i]=1;conf[act[j].i]=1;pairs.push(act[i].n+" ["+TN[tg(act[i])]+"] ↔ "+act[j].n+" ["+TN[tg(act[j])]+"] ("+b.join(", ")+")")}}
+var un=act.filter(function(c){return !isW(c)&&c.d<0}).length,st=document.getElementById("status");
+if(pairs.length){var mn=!!state.layout&&state.layout.stMin===pairs.length;st.className="bad"+(mn?" mini":"");
+st.innerHTML='<div class="sh"><b>⚠ '+pairs.length+' overlap'+(pairs.length>1?'s':'')+(mn?'':':')+'</b><button class="sm" id="st_tg" aria-expanded="'+(mn?'false':'true')+'">'+(mn?'Show':'Minimize')+'</button></div>'+(mn?'':'<div class="sl">'+pairs.map(esc).join("<br>")+'</div>');
+document.getElementById("st_tg").onclick=function(){state.layout.stMin=mn?0:pairs.length;saveUI();renderPlan()}}
+else if(un){st.className="warn";st.textContent=un+" selected class"+(un>1?"es have":" has")+" no day yet: set it to check for overlaps."}
+else if(!act.length){st.className="warn";st.textContent="No courses selected in Semester "+state.cur+" yet."}
+else{st.className="ok";st.textContent="Semester "+state.cur+": no overlaps among selected courses."}
+var stn=0,stc=0,tot=0,by={1:0,2:0};[1,2].forEach(function(n){state.s[n].forEach(function(c){if(star(c)){stn++;stc+=+c.cr||0}if(c.on&&tg(c)==="E"){var v=+c.cr||0;tot+=v;by[n]+=v}})});
+var g=+state.goal||0,left=Math.max(0,g-tot),pct=g?Math.min(100,tot/g*100):0;
+var CD=document.getElementById("cred");
+CD.innerHTML='<div class="crow"><b style="font-size:18px">'+tot+' / '+g+' credits</b><span class="sub" style="margin:0">'+(left?left+' to go':'✓ goal reached')+' · Sem 1: '+by[1]+' · Sem 2: '+by[2]+(stn?' · ★ '+stn+' starred = '+stc+' cr':'')+'</span><span style="flex:1"></span><label class="sub" style="margin:0">Goal <input id="g_goal" type="number" min="0" value="'+g+'"></label></div><div class="bar'+(left?'':' done')+'"><i style="width:'+pct+'%"></i></div><div class="sub" style="margin:0">Counts ticked courses tagged Elective, across both semesters. Credits of clashing courses are still counted, so resolve the ⚠ ones.</div>';
+document.getElementById("g_goal").onchange=function(){state.goal=+this.value;save();render()};
+var CH=document.getElementById("chips");CH.innerHTML="";
+var els=courses.filter(function(c){return tg(c)==="E"});
+if(!els.length)CH.innerHTML='<span class="sub">Tag a course as Elective and it will show up here.</span>';
+els.forEach(function(c){var d=document.createElement("div"),cf=confl(c),cr=" ("+(+c.cr||0)+"cr)";
+if(!c.on){d.className="chip na";d.textContent="○ "+c.n+cr+" (not selected)"}
+else if(!isW(c)&&c.d<0){d.className="chip na";d.textContent="? "+c.n+cr+": set a day"}
+else if(cf.length){d.className="chip clash";d.textContent="⚠ "+c.n+cr+(c.on?"":" (not selected)")+" ↔ "+cf.map(function(o){return o.n}).join(", ")}
+else{d.className="chip good";d.textContent="✓ "+c.n+cr+(c.on?"":" (not selected, would fit)")}
+if(star(c)){d.textContent="★ "+d.textContent;d.className+=" star"}CH.appendChild(d)});
+var L=document.getElementById("list");L.innerHTML="";
+courses.forEach(function(c,i){if(!vis(c))return;var w=isW(c),r=document.createElement("div");
+r.className="course"+(w?" wk":"")+(c.on&&conf[i]?" fl":"");
+var meta=[c.c,c.r,c.nt].filter(Boolean).map(esc).join(" · ");
+if(w)meta+='<br>'+ses(c).map(function(x){return fmt(x.x)+(x.s?" "+r12(x.s,x.e):" (all day)")}).join(" · ");
+r.innerHTML='<input type="checkbox" data-f="on"'+(c.on?" checked":"")+'><div><div class="n"><span class="tag" style="--tc:'+TC[tg(c)]+'">'+TN[tg(c)]+(w?" · by date":"")+'</span>'+(c.on&&conf[i]?"⚠ ":"")+(star(c)?"★ ":"")+esc(c.n)+'</div><div class="m">'+meta+'</div></div>'+tagSel(c)+'<input type="number" min="0" step="0.5" title="Credits" data-f="cr" value="'+(c.cr==null?"":c.cr)+'" placeholder="cr">'
++(w?'':'<select data-f="d">'+dayOpts(c.d)+'</select><input type="time" data-f="s" value="'+c.s+'"><input type="time" data-f="e" value="'+c.e+'">')
++'<span class="btns">'+(tg(c)==="E"?'<button class="x star'+(c.star?' on':'')+'" data-f="star" title="Star: I am considering this one">'+(c.star?"★":"☆")+'</button>':'')+'<button class="x'+(hasInf(c)?' has':'')+'" data-f="inf" title="Edit details, info and notes">ⓘ</button><button class="x" data-f="mv" title="Move to the other semester">⇄</button><button class="x" data-f="del" title="Remove">×</button></span>';
+r.querySelectorAll("[data-f]").forEach(function(el){var f=el.getAttribute("data-f");
+if(f==="star")el.onclick=function(){c.star=!c.star;save();render()};
+else if(f==="inf")el.onclick=function(){c.xo=!c.xo;render()};
+else if(f==="mv")el.onclick=function(){state.s[state.cur===1?2:1].push(c);courses.splice(i,1);save();render()};
+else if(f==="del")el.onclick=function(){courses.splice(i,1);save();render()};
+else el.onchange=function(){if(f==="on")c.on=el.checked;else if(f==="cr")c.cr=+el.value;else if(f==="d")c.d=+el.value;else c[f]=el.value;save();render()}});
+L.appendChild(r);
+if(c.xo){var pn=document.createElement("div");pn.className="info";
+function fld(lbl,el,full){var lb=document.createElement("label");if(full)lb.className="full";lb.appendChild(document.createTextNode(lbl));lb.appendChild(el);pn.appendChild(lb);return el}
+function inp(v){var e=document.createElement("input");e.value=v||"";return e}
+var eN=fld("Course name",inp(c.n)),eC=fld("Course code",inp(c.c)),eR=fld("Lecturer / location",inp(c.r)),eT=fld("Short note (shown under the name)",inp(c.nt)),eW=null;
+if(w){eW=document.createElement("textarea");eW.rows=Math.max(3,ses(c).length);eW.value=ses(c).map(function(x){var q=x.x.split("-");return q[2]+"-"+q[1]+"-"+q[0]+(x.s?" "+f12(x.s)+" - "+f12(x.e):"")}).join("\n");fld("Dates, one per line: DD-MM-YYYY or DD-MM-YYYY 3:30 PM-6:00 PM (no time = all day)",eW,1)}
+var eL=fld("Building for map link (e.g. Business School Building 21)",inp(c.loc)),eM=fld("Exact Google Maps link (optional, overrides the building)",inp(c.map)),eIv=null,eFc=null,eLc=null,eSk=null;
+if(!w){eIv=inp(c.iv||1);eIv.type="number";eIv.min="1";fld("Runs every N weeks (1 = every week, 2 = every other week)",eIv);
+eFc=inp(c.fc);eFc.type="date";fld("First class date (blank = semester start)",eFc);eLc=inp(c.lc);eLc.type="date";fld("Last class date (blank = semester end)",eLc);
+eSk=document.createElement("textarea");eSk.rows=2;eSk.value=(c.sk||[]).map(dmy).join(", ");fld("Weeks/days it does NOT run (DD-MM-YYYY, separated by commas)",eSk,1)}
+if(!w){var gd=genDates(c,semOf(c)),gl=document.createElement("div");gl.className="full";
+gl.innerHTML='<div class="sub" style="margin:0 0 4px"><b>Dates this class meets</b> ('+gd.length+' sessions)</div><div class="mt" style="font-size:13px;line-height:1.7">'+(gd.length?gd.map(fs).join(" · "):"Set the semester dates in Settings to see them.")+'</div>';
+var cb=document.createElement("button");cb.textContent="Edit as specific dates";cb.style.marginTop="8px";cb.title="Turns this class into a list of exact dates you can edit";cb.onclick=function(){c.k="W";c.w=gd.map(function(x){return {x:x,s:c.s,e:c.e}});save();render()};gl.appendChild(cb);pn.appendChild(gl)}
+var sbar=document.createElement("div");sbar.className="full";var sb=document.createElement("button");sb.className="prim";sb.textContent="Save details";var sm=document.createElement("span");sm.className="sub";sm.style.marginLeft="10px";sbar.appendChild(sb);sbar.appendChild(sm);pn.appendChild(sbar);
+var hd=document.createElement("div");hd.className="full sub";hd.style.margin="4px 0 0";hd.textContent="Day, time, type and credits can be changed directly in the row above. Notes below save automatically.";pn.appendChild(hd);
+sb.onclick=function(){function bad(t){sm.style.color="var(--bad)";sm.textContent=t}
+if(!eN.value.trim())return bad("Name can't be empty.");
+var sk=[];if(eSk){var tk=eSk.value.split(/[\s,;]+/).filter(Boolean);for(var z=0;z<tk.length;z++){var pz=parseS(tk[z]);if(!pz||pz.s)return bad('Could not read skip date "'+tk[z]+'". Use DD-MM-YYYY.');sk.push(pz.x)}}
+if(eW){var ls=eW.value.split("\n").filter(function(l){return l.trim()}),ws=[];
+for(var k=0;k<ls.length;k++){var pp=parseS(ls[k]);if(!pp)return bad('Could not read "'+ls[k]+'". Use DD-MM-YYYY, optionally with a time like 3:30 PM-6:00 PM.');if(pp.s&&m(pp.e)<=m(pp.s))return bad("End time must be after start for "+fmt(pp.x)+".");ws.push(pp)}
+if(!ws.length)return bad("Add at least one date.");c.w=ws}
+if(eSk){c.sk=sk;c.iv=Math.max(1,Math.floor(+eIv.value)||1);c.fc=eFc.value;c.lc=eLc.value}c.loc=eL.value.trim();c.map=eM.value.trim();
+c.n=eN.value.trim();c.c=eC.value.trim();c.r=eR.value.trim();c.nt=eT.value.trim();save();render()};
+INF.forEach(function(f){var lb=document.createElement("label");if(f[2])lb.className="full";lb.appendChild(document.createTextNode(f[1]));
+var ta=document.createElement("textarea");ta.value=(c.inf&&c.inf[f[0]])||"";ta.oninput=function(){c.inf=c.inf||{};c.inf[f[0]]=ta.value;save()};lb.appendChild(ta);pn.appendChild(lb)});
+L.appendChild(pn)}});
+var WS=[];courses.forEach(function(c){if(isW(c)&&vis(c))ses(c).forEach(function(x){WS.push({c:c,x:x})})});
+WS.sort(function(a,b){return a.x.x<b.x.x?-1:a.x.x>b.x.x?1:m(a.x.s||"00:00")-m(b.x.s||"00:00")});
+var WD=document.getElementById("ws");
+WD.innerHTML=WS.length?"":'<span class="sub">Nothing here yet. Add a course with Kind = Specific dates, or use "Edit as specific dates" on a weekly class (ⓘ).</span>';
+WS.forEach(function(q){var cl=[];
+courses.forEach(function(o){if(o===q.c||!o.on)return;
+if(isW(o))ses(o).forEach(function(y){if(y.x===q.x.x&&ov(rng(q.x),rng(y)))cl.push(o.n)});
+else if(o.d===wd(q.x.x)&&ov(rng(q.x),[m(o.s),m(o.e)]))cl.push(o.n+" (weekly)")});
+var d=document.createElement("div");d.className="wsr"+(q.c.on?"":" off");
+d.innerHTML='<div>'+fmt(q.x.x)+'</div><div>'+(q.x.s?r12(q.x.s,q.x.e):"all day (time TBC)")+'</div><div><span class="tag" style="--tc:'+TC[tg(q.c)]+'">'+TN[tg(q.c)]+'</span>'+(star(q.c)?"★ ":"")+esc(q.c.n)+' · '+(+q.c.cr||0)+'cr'+(q.c.on&&cl.length?' <b style="color:var(--bad)">⚠ clashes with '+esc(cl.join(", "))+'</b>':(q.c.on?' ✓':''))+(q.c.on?'':' (not selected)')+'</div>';
+WD.appendChild(d)});
+var byD={};courses.forEach(function(c){if(isW(c)&&vis(c))ses(c).forEach(function(x){byD[x.x]=1})});
+var cols=[];Object.keys(byD).sort().forEach(function(dt){var its=[];
+courses.forEach(function(c){if(isW(c))ses(c).forEach(function(x){if(x.x===dt){var r=rng(x);its.push({n:(star(c)?"★ ":"")+c.n,t:tg(c),a:r[0],b:r[1],on:c.on,v:vis(c),lab:x.s?r12(x.s,x.e):"all day"})}});
+else if(c.on&&c.d===wd(dt)&&c.d>=0)its.push({n:(star(c)?"★ ":"")+c.n+" (weekly)",t:tg(c),a:m(c.s),b:m(c.e),on:true,v:vis(c),lab:r12(c.s,c.e)})});
+its.forEach(function(X){X.cl=X.on&&its.some(function(Y){return Y!==X&&Y.on&&ov([X.a,X.b],[Y.a,Y.b])})});
+if(!wOnly||its.some(function(X){return X.cl}))cols.push({dt:dt,its:its})});
+var WC=document.getElementById("wcal"),PXw=0.9,Hw=(1320-480)*PXw;
+var wo=document.getElementById("w_only");wo.checked=wOnly;wo.onchange=function(){wOnly=wo.checked;render()};
+if(!cols.length)WC.innerHTML='<span class="sub">'+(wOnly?"No clashing workshop dates.":"No dated sessions in this view.")+'</span>';
+else{var wh='<div class="grid" style="grid-template-columns:44px repeat('+cols.length+',minmax(150px,1fr));min-width:'+(44+cols.length*150)+'px"><div class="hd"></div>'+cols.map(function(c){return '<div class="hd">'+fmt(c.dt)+'</div>'}).join("");
+wh+='<div class="lbl" style="height:'+Hw+'px">';for(var t=480;t<=1320;t+=60)wh+='<div style="position:absolute;top:'+((t-480)*PXw-7)+'px">'+hl(t)+'</div>';wh+='</div>';
+cols.forEach(function(c){var its=c.its.slice().sort(function(x,y){return x.a-y.a||x.b-y.b}),cl=[],le=[],ce=-1;
+function fin(){cl.forEach(function(q){q.n2=le.length});cl=[];le=[]}
+its.forEach(function(q){if(cl.length&&q.a>=ce){fin();ce=-1}var ln=0;while(ln<le.length&&le[ln]>q.a)ln++;le[ln]=q.b;q.ln=ln;cl.push(q);ce=Math.max(ce,q.b)});fin();
+var h='<div class="col" style="height:'+Hw+'px">';for(var t=480;t<=1320;t+=60)h+='<div class="hr" style="top:'+((t-480)*PXw)+'px"></div>';
+its.forEach(function(q){var k=q.n2||1;
+h+='<div class="blk'+(q.cl?" c":"")+(q.on?"":" off")+(q.v?"":" dim")+(k>1?" nr":"")+'" title="'+esc(q.n+" ("+q.lab+", "+TN[q.t]+(q.on?"":", not selected")+")")+'" style="top:'+((Math.max(q.a,480)-480)*PXw)+'px;height:'+((q.b-q.a)*PXw)+'px;left:calc('+(q.ln*100/k)+'% + 3px);width:calc('+(100/k)+'% - 6px);background:'+TC[q.t]+'"><b>'+(q.cl?"⚠ ":"")+esc(q.n)+'</b>'+q.lab+(k>1?'':' · '+TN[q.t])+'</div>'});
+wh+=h+'</div>'});WC.innerHTML=wh+'</div>'}
+var S=480,E=1320,PX=0.9,H=(E-S)*PX,gr=document.getElementById("grid");
+gr.innerHTML='<div class="hd"></div>'+DAYS.map(function(d){return '<div class="hd">'+d+'</div>'}).join("");
+var lab='<div class="lbl" style="height:'+H+'px">';
+for(var t=S;t<=E;t+=60)lab+='<div style="position:absolute;top:'+((t-S)*PX-7)+'px">'+hl(t)+'</div>';
+gr.insertAdjacentHTML("beforeend",lab+"</div>");
+DAYS.forEach(function(_,d){
+var h='<div class="col" style="height:'+H+'px">';
+for(var t=S;t<=E;t+=60)h+='<div class="hr" style="top:'+((t-S)*PX)+'px"></div>';
+var items=act.filter(function(c){return !isW(c)&&c.d===d}).sort(function(x,y){return m(x.s)-m(y.s)||m(x.e)-m(y.e)});
+var cl=[],le=[],cEnd=-1;function fin(){cl.forEach(function(c){c.n2=le.length});cl=[];le=[]}
+items.forEach(function(c){if(cl.length&&m(c.s)>=cEnd){fin();cEnd=-1}var ln=0;while(ln<le.length&&le[ln]>m(c.s))ln++;le[ln]=m(c.e);c.ln=ln;cl.push(c);cEnd=Math.max(cEnd,m(c.e))});fin();
+items.forEach(function(c){var top=(Math.max(m(c.s),S)-S)*PX,ht=(m(c.e)-m(c.s))*PX,k=c.n2||1;
+h+='<div class="blk'+(conf[c.i]?" c":"")+(vis(c)?"":" dim")+(k>1?" nr":"")+'" title="'+esc(c.n+" ("+r12(c.s,c.e)+", "+TN[tg(c)]+")")+'" style="top:'+top+'px;height:'+ht+'px;left:calc('+(c.ln*100/k)+'% + 3px);width:calc('+(100/k)+'% - 6px);background:'+TC[tg(c)]+'"><b>'+(conf[c.i]?"⚠ ":"")+(star(c)?"★ ":"")+esc(c.n)+'</b>'+r12(c.s,c.e)+(k>1?'':' · '+TN[tg(c)])+'</div>'});
+gr.insertAdjacentHTML("beforeend",h+"</div>")})}
+var tdate=null,tmode="day";
+function p2(n){return ("0"+n).slice(-2)}
+function iso(d){return d.getFullYear()+"-"+p2(d.getMonth()+1)+"-"+p2(d.getDate())}
+function addD(ds,n){var d=new Date(ds+"T12:00:00");d.setDate(d.getDate()+n);return iso(d)}
+function dd(a,b){return Math.round((new Date(b+"T12:00:00")-new Date(a+"T12:00:00"))/864e5)}
+function dmy(x){var q=x.split("-");return q[2]+"-"+q[1]+"-"+q[0]}
+tdate=iso(new Date());
+function semOf(c){return state.s[1].indexOf(c)>=0?1:2}
+function fs(ds){var d=new Date(ds+"T12:00:00");return DN[d.getDay()]+" "+d.getDate()+" "+MN[d.getMonth()]}
+function genDates(c,n){var S=state.sem[n]||{},a=c.fc||S.a,b=c.lc||S.b,out=[];if(!a||!b||c.d<0)return out;
+for(var ds=addD(a,(c.d-wd(a)+7)%7);ds<=b&&out.length<200;ds=addD(ds,7))if(occ(c,n,ds))out.push(ds);return out}
+function occ(c,n,ds){if(c.d<0||wd(ds)!==c.d)return false;var S=state.sem[n]||{},a=c.fc||S.a||"",b=c.lc||S.b||"";
+if(a&&ds<a)return false;if(b&&ds>b)return false;if((c.sk||[]).indexOf(ds)>=0)return false;
+var iv=c.iv||1;if(iv>1&&a){var s0=addD(a,(c.d-wd(a)+7)%7);if(dd(s0,ds)/7%iv!==0)return false}return true}
+function evsOn(ds){var out=[];[1,2].forEach(function(n){state.s[n].forEach(function(c){if(!c.on)return;
+if(isW(c)){ses(c).forEach(function(x){if(x.x===ds){var r=rng(x);out.push({c:c,a:r[0],b:r[1],s:x.s,e:x.e,tm:x.s?r12(x.s,x.e):"All day (time TBC)"})}})}
+else if(occ(c,n,ds))out.push({c:c,a:m(c.s),b:m(c.e),s:c.s,e:c.e,tm:r12(c.s,c.e)})})});
+out.sort(function(x,y){return x.a-y.a||x.b-y.b});
+out.forEach(function(X){X.cl=out.some(function(Y){return Y!==X&&ov([X.a,X.b],[Y.a,Y.b])})});return out}
+function mapUrl(c){var u=(c.map||"").trim();if(/^https?:\/\//i.test(u))return u;var q=(c.loc||"").trim();if(!q)return "";
+return "https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(q+(state.campus?", "+state.campus:""))+"&travelmode="+(state.travel||"walking")}
+function evCard(X,ds,st){var c=X.c,col=TC[tg(c)],tdy=ds===st.td,ad=!X.s,
+past=tdy&&X.b<=st.now&&!ad,now=tdy&&st.now>=X.a&&st.now<X.b&&!ad,nxt=tdy&&X===st.next,url=mapUrl(c);
+var det=INF.filter(function(f){return c.inf&&(c.inf[f[0]]||"").trim()}).map(function(f){return '<div class="mt"><b>'+f[1]+':</b> '+esc(c.inf[f[0]]).replace(/\n/g,"<br>")+'</div>'}).join("");
+return '<div class="ev'+(X.cl?' cl':'')+(past?' past':'')+(now?' now':'')+'" style="--tc:'+(X.cl?'var(--bad)':col)+'"><div class="tcol">'+(ad?'<div class="t1 ad">All day</div><div class="t2">time TBC</div>':'<div class="t1">'+f12h(X.s)+'</div><div class="t2">'+f12(X.e)+'</div>')+'</div><div class="eb"><div class="nm">'+(X.cl?"⚠ ":"")+(star(c)?"★ ":"")+esc(c.n)+(now?'<span class="bdg now">Now</span>':nxt?'<span class="bdg nxt">Next</span>':'')+'</div><div class="mt"><span class="tag" style="--tc:'+col+'">'+TN[tg(c)]+(isW(c)?" · by date":"")+'</span>'+esc([c.r,c.nt].filter(Boolean).join(" · "))+'</div>'
++(X.cl?'<div class="mt bd">Overlaps with another class this day</div>':'')
++(url?'<a class="dir" href="'+esc(url)+'" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11a7 7 0 10-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>Directions</a>':'<div class="mt">No building set. Add one under ⓘ in the Planner to get a map link.</div>')
++(det?'<details><summary>More info</summary>'+det+'</details>':'')+'</div></div>'}
+function renderToday(){var V=document.getElementById("v_today"),now=new Date(),td=iso(now),nowM=now.getHours()*60+now.getMinutes();
+var wk=tmode==="week",ws=wk?addD(tdate,-wd(tdate)):tdate;
+var sum="",FN=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+var h='@@HERO@@<div class="dh"><div class="grp"><button id="t_prev" aria-label="Previous">‹</button><button id="t_today">Today</button><button id="t_next" aria-label="Next">›</button></div><div class="grp"><button class="seg'+(wk?'':' on')+'" id="t_day">Day</button><button class="seg'+(wk?' on':'')+'" id="t_week">Week</button></div><input type="date" id="t_date" value="'+tdate+'"></div>';
+var needCampus=!state.campus;
+function dayHtml(ds){var evs=evsOn(ds),st={td:td,now:nowM,next:null};if(ds===td)for(var i=0;i<evs.length;i++)if(evs[i].a>nowM){st.next=evs[i];break}
+return {n:evs.length,first:evs.length&&evs[0].s?f12(evs[0].s):"",html:evs.map(function(X){return evCard(X,ds,st)}).join("")}}
+var any=false;
+if(!wk){var r=dayHtml(tdate);any=r.n>0;
+sum=r.n?r.n+(r.n>1?' classes':' class')+(r.first?' · starts at '+r.first:''):'Nothing scheduled';h+=r.html;
+if(!r.n){h+='<div class="card"><b>No classes'+(tdate===td?' today':' this day')+' 🎉</b>';
+for(var k=1;k<=150;k++){var nd=addD(tdate,k),ne=evsOn(nd);if(ne.length){h+='<div class="sub" style="margin:6px 0 0">Next up: '+fmt(nd)+' · '+ne[0].tm+' · '+esc(ne[0].c.n)+'</div>';break}}h+='</div>'}}
+else{var tot=0,body="";for(var i=0;i<7;i++){var ds=addD(ws,i),r=dayHtml(ds);tot+=r.n;if(i===6&&!r.n)continue;
+body+='<div class="dayh'+(ds===td?' today':'')+'">'+fmt(ds)+(ds===td?' · Today':'')+(r.n?'':' <span class="sub">No classes</span>')+'</div>'+r.html}
+sum=tot+(tot===1?' class session':' class sessions');h+=body}
+if(needCampus)h+='<div class="card warn" style="margin-top:14px">Map links need your campus or area to find the right building. <button id="t_set">Open Settings</button></div>';
+function sd(x){var d=new Date(x+"T12:00:00");return d.getDate()+" "+MN[d.getMonth()]}
+var d0=new Date(tdate+"T12:00:00"),hero=wk?'<div class="hero"><div class="h1">'+(td>=ws&&td<=addD(ws,6)?"This week":"Week of "+sd(ws))+'</div><div class="h2">'+sd(ws)+' – '+sd(addD(ws,6))+' '+new Date(addD(ws,6)+"T12:00:00").getFullYear()+'</div><div class="hs">'+sum+'</div></div>'
+:'<div class="hero"><div class="h1">'+FN[d0.getDay()]+(tdate===td?' · Today':'')+'</div><div class="h2">'+sd(tdate)+' '+d0.getFullYear()+'</div><div class="hs">'+sum+'</div></div>';
+h=h.replace("@@HERO@@",hero);V.innerHTML=h;
+function go(n){tdate=addD(tdate,n);renderToday()}
+document.getElementById("t_prev").onclick=function(){go(wk?-7:-1)};document.getElementById("t_next").onclick=function(){go(wk?7:1)};
+document.getElementById("t_today").onclick=function(){tdate=iso(new Date());renderToday()};
+document.getElementById("t_date").onchange=function(){if(this.value){tdate=this.value;renderToday()}};
+document.getElementById("t_day").onclick=function(){tmode="day";renderToday()};document.getElementById("t_week").onclick=function(){tmode="week";renderToday()};
+var ts=document.getElementById("t_set");if(ts)ts.onclick=function(){state.nav="set";render()}}
+function renderSet(){var V=document.getElementById("v_set"),S=state.sem;
+V.innerHTML='<div class="card"><h2>Map links</h2><label class="setl">Campus or area added to every building search (e.g. university name and city)<input id="s_campus" value="'+esc(state.campus||"")+'" placeholder="e.g. Tel Aviv University, Tel Aviv"></label><label class="setl">Travel mode<select id="s_tm">'+["walking","driving","transit","bicycling"].map(function(t){return '<option'+((state.travel||"walking")===t?' selected':'')+'>'+t+'</option>'}).join("")+'</select></label><div class="sub" style="margin:0">Each course needs a building (set it under ⓘ in the Planner). You can paste an exact Google Maps link there to override.</div></div>'
++'<div class="card"><h2>Semester dates</h2><div class="sub">Weekly classes only appear between these dates. Please check them; they are placeholders until you enter your real dates.</div>'
++[1,2].map(function(n){return '<label class="setl">Semester '+n+' starts<input type="date" data-s="'+n+'a" value="'+(S[n].a||"")+'"></label><label class="setl">Semester '+n+' ends<input type="date" data-s="'+n+'b" value="'+(S[n].b||"")+'"></label>'}).join("")+'</div>';
+V.insertAdjacentHTML("beforeend",'<div class="card"><h2>Your data</h2><div class="sub">Everything you enter is saved automatically on this device. To move your data to another phone or computer, tap <b>Copy data</b>, then paste it into the Data text box on the other device and tap Load.</div><button class="prim" id="s_copy">Copy data</button><label class="setl" style="margin-top:14px">Data text. To restore or move data, paste it here and tap Load.<textarea id="s_txt" rows="4" style="width:100%"></textarea></label><button id="s_load">Load pasted data</button><div class="sub" id="s_msg" style="margin-top:8px"></div></div>');
+var tx=document.getElementById("s_txt"),sm=document.getElementById("s_msg");tx.value=dataJson();
+document.getElementById("s_copy").onclick=function(){try{navigator.clipboard.writeText(dataJson()).then(function(){sm.textContent="Copied."},function(){tx.select();sm.textContent="Could not copy automatically: the text is selected, copy it manually."})}catch(e){tx.select();sm.textContent="Select the text above and copy it."}};
+document.getElementById("s_load").onclick=function(){try{var d=JSON.parse(tx.value);if(!d||!d.s||!d.s[1]||!d.s[2])throw 0;state=d;norm();state.nav="set";courses=state.s[state.cur]||state.s[1];save();render();applyLayout();saveUI();document.getElementById("s_msg").textContent="Data loaded and saved on this device."}catch(e){sm.style.color="var(--bad)";sm.textContent="That does not look like planner data."}};
+document.getElementById("s_campus").onchange=function(){state.campus=this.value.trim();save();render()};
+document.getElementById("s_tm").onchange=function(){state.travel=this.value;save();render()};
+V.querySelectorAll("[data-s]").forEach(function(el){el.onchange=function(){var k=el.getAttribute("data-s");state.sem[+k[0]][k[1]]=el.value;save();render()}})}
+function showNav(){var N=document.getElementById("nav");N.innerHTML="";
+var IC={today:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',plan:'<rect x="3" y="4" width="18" height="17" rx="3"/><path d="M3 9h18M8 2v4M16 2v4"/>',set:'<path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/>'};
+[["today","Today"],["plan","Planner"],["set","Settings"]].forEach(function(t){var b=document.createElement("button");b.className=state.nav===t[0]?"on":"";
+b.innerHTML='<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+IC[t[0]]+'</svg>'+t[1];b.onclick=function(){state.nav=t[0];render();window.scrollTo(0,0)};N.appendChild(b)});
+["today","plan","set"].forEach(function(k){document.getElementById("v_"+k).hidden=state.nav!==k})}
+function render(){renderPlan();renderToday();renderSet();showNav();updDirty()}
+function secs(){return [].slice.call(document.querySelectorAll("#secs>.card"))}
+function saveUI(){try{localStorage.setItem("plannerUI",JSON.stringify(state.layout))}catch(e){}}
+function saveOrder(){state.layout.order=secs().map(function(c){return c.getAttribute("data-sec")});saveUI()}
+function setMin(card,min){card.classList.toggle("min",!!min);var b=card.querySelector(".cv");b.setAttribute("aria-expanded",min?"false":"true");b.title=min?"Expand":"Minimize"}
+function place(card,y){var box=document.getElementById("secs"),o=secs().filter(function(c){return c!==card}),t=null;
+for(var i=0;i<o.length;i++){var r=o[i].getBoundingClientRect();if(y<r.top+r.height/2){t=o[i];break}}
+if(t){if(card.nextElementSibling!==t)box.insertBefore(card,t)}else if(box.lastElementChild!==card)box.appendChild(card)}
+function initSecs(){secs().forEach(function(card){var id=card.getAttribute("data-sec"),h=card.querySelector("h2"),hd=document.createElement("div"),body=document.createElement("div"),dg=document.createElement("button"),cv=document.createElement("button"),box=document.getElementById("secs");
+hd.className="ch";body.className="cb";card.insertBefore(hd,h);
+dg.className="dg";dg.title="Drag to reorder (or use the up/down arrow keys)";dg.setAttribute("aria-label","Reorder "+h.textContent);
+dg.innerHTML='<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><circle cx="9" cy="6" r="1.8"/><circle cx="15" cy="6" r="1.8"/><circle cx="9" cy="12" r="1.8"/><circle cx="15" cy="12" r="1.8"/><circle cx="9" cy="18" r="1.8"/><circle cx="15" cy="18" r="1.8"/></svg>';
+cv.className="cv";cv.innerHTML='<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>';
+hd.appendChild(dg);hd.appendChild(h);hd.appendChild(cv);while(hd.nextSibling)body.appendChild(hd.nextSibling);card.appendChild(body);
+cv.onclick=function(){var m2=!card.classList.contains("min");setMin(card,m2);state.layout.col[id]=m2;saveUI()};
+dg.onkeydown=function(e){var k=e.key;if(k!=="ArrowUp"&&k!=="ArrowDown")return;e.preventDefault();
+if(k==="ArrowUp"&&card.previousElementSibling)box.insertBefore(card,card.previousElementSibling);
+if(k==="ArrowDown"&&card.nextElementSibling)box.insertBefore(card.nextElementSibling,card);
+saveOrder();dg.focus();card.scrollIntoView({block:"nearest"})};
+dg.onpointerdown=function(e){if(e.button>0)return;e.preventDefault();var y=e.clientY,tm;try{dg.setPointerCapture(e.pointerId)}catch(x){}
+card.classList.add("dragging");
+function mv(ev){y=ev.clientY}
+function up(){clearInterval(tm);card.classList.remove("dragging");dg.removeEventListener("pointermove",mv);dg.removeEventListener("pointerup",up);dg.removeEventListener("pointercancel",up);saveOrder()}
+dg.addEventListener("pointermove",mv);dg.addEventListener("pointerup",up);dg.addEventListener("pointercancel",up);
+tm=setInterval(function(){if(y<80)window.scrollBy(0,-14);else if(y>window.innerHeight-80)window.scrollBy(0,14);place(card,y)},30)}})}
+function applyLayout(){var L=state.layout||{order:[],col:{}},box=document.getElementById("secs"),cards=secs(),seen={};
+(L.order||[]).forEach(function(id){cards.forEach(function(c){if(c.getAttribute("data-sec")===id){box.appendChild(c);seen[id]=1}})});
+cards.forEach(function(c){var id=c.getAttribute("data-sec");if(!seen[id])box.appendChild(c);setMin(c,!!(L.col||{})[id])})}
+document.getElementById("sec_col").onclick=function(){secs().forEach(function(c){setMin(c,true);state.layout.col[c.getAttribute("data-sec")]=true});saveUI()};
+document.getElementById("sec_exp").onclick=function(){secs().forEach(function(c){setMin(c,false);state.layout.col[c.getAttribute("data-sec")]=false});saveUI()};
+function dataJson(saved){return JSON.stringify(Object.assign({},state,{nav:"today"},saved?{userSaved:true}:{}),function(k,v){return(k==="i"||k==="ln"||k==="n2"||k==="xo")?undefined:v})}
+function buildFile(){var j=dataJson(true).replace(/</g,"\\u003c");
+return "<!DOCTYPE html>\n"+SRC.replace(/(<script type="application\/json" id="plannerData">)[\s\S]*?(<\/script>)/,function(_,a,b){return a+j+b})}
+function dl(){var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([buildFile()],{type:"text/html"}));a.download="semester-planner.html";document.body.appendChild(a);a.click();var u=a.href;setTimeout(function(){URL.revokeObjectURL(u);a.remove()},800);dirty=false;migrated=false;updDirty()}
+function updDirty(){var d=document.getElementById("dirty");if(!d)return;d.hidden=!dirty;document.getElementById("d_txt").textContent=migrated?"Imported from this browser's old storage. Save the file to keep it.":"Unsaved changes"}
+document.getElementById("d_save").onclick=dl;
+window.onbeforeunload=function(e){if(dirty){e.preventDefault();e.returnValue=""}};
+document.getElementById("a_kind").onchange=function(){var w=this.value==="W";document.getElementById("f_week").hidden=w;document.getElementById("f_ws").hidden=!w;document.getElementById("f_wt").hidden=!w};
+document.getElementById("a_btn").onclick=function(){
+function v(id){return document.getElementById(id).value.trim()}
+var msg=document.getElementById("a_msg");function err(t){msg.style.color="var(--bad)";msg.textContent=t}msg.style.color="";
+var n=v("a_name");if(!n)return err("Please enter a course name.");
+var W=v("a_kind")==="W",sem=+v("a_sem"),r=[v("a_lec"),v("a_room")].filter(Boolean).join(" · ");
+var o={n:n,c:v("a_code"),loc:v("a_loc"),r:r,nt:v("a_notes"),t:v("a_tag"),cr:+v("a_cr")||0,on:true};
+if(W){var dS=v("a_ds"),dE=v("a_de");if(!!dS!==!!dE)return err("Enter both a default start and end, or leave both blank.");if(dS&&m(dE)<=m(dS))return err("Default end must be after default start.");var ws=[];var ls=document.getElementById("a_dates").value.split("\n").filter(function(l){return l.trim()});
+for(var i=0;i<ls.length;i++){var p=parseS(ls[i]);if(!p)return err('Could not read date line "'+ls[i]+'". Use DD-MM-YYYY, optionally followed by a time like 3:30 PM-6:00 PM.');if(!p.s&&dS){p.s=dS;p.e=dE}if(p.s&&m(p.e)<=m(p.s))return err("End time must be after start for "+fmt(p.x)+".");ws.push(p)}
+if(!ws.length)return err("Add at least one date for the workshop.");o.k="W";o.w=ws}
+else{if(m(v("a_e"))<=m(v("a_s")))return err("End time must be after start time.");o.s=v("a_s");o.e=v("a_e");o.d=+v("a_day")}
+var inf={},any=false;INF.forEach(function(f){var t=document.getElementById('ai_'+f[0]);inf[f[0]]=t.value;if(t.value.trim())any=true;t.value=''});if(any)o.inf=inf;
+state.s[sem].push(o);["a_name","a_code","a_lec","a_room","a_loc","a_notes","a_dates","a_ds","a_de"].forEach(function(id){document.getElementById(id).value=""});
+msg.textContent='Added "'+n+'" to Semester '+sem+'.';state.cur=sem;courses=state.s[sem];save();render()};
+try{var uiL=JSON.parse(localStorage.getItem("plannerUI")||"null");if(uiL&&uiL.order){if(!uiL.col)uiL.col={};state.layout=uiL}}catch(e){}
+initSecs();applyLayout();
+render();
+if("serviceWorker" in navigator&&/^https?:/.test(location.protocol))window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){})});
+</script></body></html>
