@@ -25,7 +25,7 @@ input[type=checkbox]{width:20px;height:20px;accent-color:var(--ac)}button{cursor
 .nav{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;gap:4px;padding:6px 10px calc(6px + env(safe-area-inset-bottom,0px));background:#0b3954;border-top:0}
 .nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;border:0;background:none;color:rgba(255,255,255,.7);font-size:12px;font-weight:600;padding:7px 4px;border-radius:12px;min-height:52px}
 .nav button.on{background:rgba(255,255,255,.16);color:#fff}
-#v_today,#v_set{max-width:640px;margin:0 auto}
+#v_today,#v_set,#v_hw{max-width:640px;margin:0 auto}
 .tabs,.views{display:flex;gap:6px;margin:10px 0 12px;flex-wrap:wrap;align-items:center}.views span{color:var(--mu);font-size:13px}
 .tab,.vb{border-radius:99px;padding:8px 16px;font-weight:600}.tab.on{background:var(--ac);color:var(--on);border-color:var(--ac)}.vb{padding:6px 14px}.vb.on{background:var(--tx);color:var(--bg);border-color:var(--tx)}
 .course{display:grid;grid-template-columns:auto 1fr auto 64px auto auto auto auto;gap:8px;align-items:center;padding:10px 0;border-top:1px solid var(--ln)}
@@ -58,6 +58,11 @@ button.x.star{font-size:19px}button.x.star.on{color:var(--gold)}.chip.star{box-s
 .card.min .cb{display:none}.card.min .ch{margin-bottom:0}.card.min .cv svg{transform:rotate(-90deg)}
 .card.dragging{box-shadow:0 12px 32px rgba(0,0,0,.28);position:relative;z-index:6;border-color:var(--ac)}
 .secbar{display:flex;gap:8px;align-items:center;margin:0 0 12px;flex-wrap:wrap}.secbar button{padding:6px 14px;border-radius:99px}
+.nav button{position:relative}.nav .bg{position:absolute;top:2px;left:calc(50% + 6px);min-width:18px;height:18px;padding:0 5px;border-radius:99px;background:#e0a800;color:#10202e;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.hw{margin-top:12px;padding-top:10px;border-top:1px dashed var(--ln)}.hwh{font-size:12px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
+.hwi{display:flex;gap:10px;align-items:flex-start;padding:7px 0;font-size:15px;min-height:38px;cursor:pointer}.hwi input{margin-top:2px;flex:none}.hwi small{color:var(--mu);font-size:12px;display:block}.hwi.done span{text-decoration:line-through;color:var(--mu)}.hwi .hx{margin-left:auto;border:0;background:none;color:var(--mu);font-size:18px;padding:0 6px}
+.hwadd{display:flex;gap:8px;margin-top:6px}.hwadd input,.hwadd select{flex:1;min-width:0;padding:10px 12px;font-size:15px}.hwadd button{padding:0 18px;border-radius:99px;background:var(--soft);font-weight:600;min-height:44px}
+.hwg{margin-bottom:12px}.hwg h3{font:700 15px var(--f1);margin:0 0 2px;display:flex;align-items:center;gap:8px}.hwg h3 i{width:10px;height:10px;border-radius:3px;display:inline-block}
 .hero{background:var(--ac);color:var(--on);border-radius:20px;padding:18px 20px;margin-bottom:12px}.hero .h1{font:700 30px/1.05 var(--f1);letter-spacing:-.02em}.hero .h2{font-size:16px;margin-top:4px;opacity:.85}.hero .hs{font-size:14px;margin-top:10px;font-weight:600}
 .dh{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}.dh input{min-height:44px;flex:1 1 130px}
 .grp{display:inline-flex;border:1px solid var(--ln);border-radius:99px;overflow:hidden;background:var(--card)}.grp button{border:0;border-radius:0;background:none;padding:0 15px;min-height:44px;font-weight:600}.grp button.on{background:var(--ac);color:var(--on)}
@@ -73,6 +78,7 @@ a.dir{display:inline-flex;align-items:center;gap:8px;margin-top:10px;padding:0 1
 <header class="top"><h1>Semester planner</h1></header>
 <nav class="nav" id="nav"></nav>
 <div id="v_today"></div>
+<div id="v_hw" hidden></div>
 <div id="v_set" hidden></div>
 <div id="v_plan" hidden>
 <div class="sub">Tick courses to consider. Overlaps turn red. Workshops (specific dates) are checked against weekly classes and each other.</div>
@@ -137,7 +143,7 @@ return {x:x,s:to24(r[7]||""),e:to24(r[8]||"")}}
 var state={cur:1,s:{1:DEF,2:[]},goal:14},dirty=false,migrated=false;
 try{var el0=document.getElementById("plannerData"),tx0=((el0&&el0.textContent)||"").trim(),emb=tx0?JSON.parse(tx0):null,pv=localStorage.getItem("plannerPWA");
 if(pv)state=JSON.parse(pv);else if(emb)state=emb}catch(e){}
-function norm(){if(!state.goal)state.goal=14;if(!state.layout)state.layout={order:[],col:{}};
+function norm(){if(!state.goal)state.goal=14;if(!state.hw)state.hw=[];if(!state.layout)state.layout={order:[],col:{}};
 if(!state.sem)state.sem={1:{a:"2026-10-18",b:"2027-01-29"},2:{a:"2027-03-14",b:"2027-07-02"}};
 if(!state.nav)state.nav="today";if(state.campus==null)state.campus="";
 if(!state.seed2){if(!state.s[2]||!state.s[2].length)state.s[2]=DEF2;state.seed2=1}
@@ -216,7 +222,7 @@ r.querySelectorAll("[data-f]").forEach(function(el){var f=el.getAttribute("data-
 if(f==="star")el.onclick=function(){c.star=!c.star;save();render()};
 else if(f==="inf")el.onclick=function(){c.xo=!c.xo;render()};
 else if(f==="mv")el.onclick=function(){state.s[state.cur===1?2:1].push(c);courses.splice(i,1);save();render()};
-else if(f==="del")el.onclick=function(){courses.splice(i,1);save();render()};
+else if(f==="del")el.onclick=function(){if(c.id)state.hw=(state.hw||[]).filter(function(h){return h.cid!==c.id});courses.splice(i,1);save();render()};
 else el.onchange=function(){if(f==="on")c.on=el.checked;else if(f==="cr")c.cr=+el.value;else if(f==="d")c.d=+el.value;else c[f]=el.value;save();render()}});
 L.appendChild(r);
 if(c.xo){var pn=document.createElement("div");pn.className="info";
@@ -314,7 +320,35 @@ var det=INF.filter(function(f){return c.inf&&(c.inf[f[0]]||"").trim()}).map(func
 return '<div class="ev'+(X.cl?' cl':'')+(past?' past':'')+(now?' now':'')+'" style="--tc:'+(X.cl?'var(--bad)':col)+'"><div class="tcol">'+(ad?'<div class="t1 ad">All day</div><div class="t2">time TBC</div>':'<div class="t1">'+f12h(X.s)+'</div><div class="t2">'+f12(X.e)+'</div>')+'</div><div class="eb"><div class="nm">'+(X.cl?"⚠ ":"")+(star(c)?"★ ":"")+esc(c.n)+(now?'<span class="bdg now">Now</span>':nxt?'<span class="bdg nxt">Next</span>':'')+'</div><div class="mt"><span class="tag" style="--tc:'+col+'">'+TN[tg(c)]+(isW(c)?" · by date":"")+'</span>'+esc([c.r,c.nt].filter(Boolean).join(" · "))+'</div>'
 +(X.cl?'<div class="mt bd">Overlaps with another class this day</div>':'')
 +(url?'<a class="dir" href="'+esc(url)+'" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11a7 7 0 10-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>Directions</a>':'<div class="mt">No building set. Add one under ⓘ in the Planner to get a map link.</div>')
-+(det?'<details><summary>More info</summary>'+det+'</details>':'')+'</div></div>'}
++hwSection(c,ds,past)+(det?'<details><summary>More info</summary>'+det+'</details>':'')+'</div></div>'}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+function cidOf(c){return c.id||(c.id=uid())}
+function nOpen(){return (state.hw||[]).filter(function(h){return !h.done}).length}
+function hwSection(c,ds,past){var id=cidOf(c),items=(state.hw||[]).filter(function(h){return h.cid===id&&!h.done});
+return '<div class="hw"><div class="hwh">Homework'+(items.length?' · '+items.length+' open':'')+'</div>'+items.map(function(h){return '<label class="hwi"><input type="checkbox" data-hw="'+h.id+'"><span>'+esc(h.t)+(h.d&&h.d!==ds?'<small>from '+fs(h.d)+'</small>':'')+'</span></label>'}).join("")
++'<div class="hwadd"><input data-hwin="'+id+'" data-d="'+ds+'" placeholder="'+(past?'Any homework from this class?':'Add homework…')+'" maxlength="160"><button data-hwadd="'+id+'" data-d="'+ds+'">Add</button></div></div>'}
+function addHw(id,t,d){t=(t||"").trim();if(!t||!id)return;if(!state.hw)state.hw=[];state.hw.push({id:uid(),cid:id,d:d||iso(new Date()),t:t,done:false});save();render()}
+function hwEvents(box){
+box.addEventListener("change",function(e){var t=e.target,id=t.getAttribute&&t.getAttribute("data-hw");if(!id)return;state.hw.forEach(function(h){if(h.id===id)h.done=t.checked});save();render()});
+box.addEventListener("click",function(e){var b=e.target.closest?e.target.closest("button"):null;if(!b)return;
+if(b.hasAttribute("data-hwadd")){addHw(b.getAttribute("data-hwadd"),b.previousElementSibling.value,b.getAttribute("data-d"))}
+else if(b.hasAttribute("data-hwadd2")){addHw(document.getElementById("hw_c").value,document.getElementById("hw_t").value)}
+else if(b.hasAttribute("data-hwdel")){var id=b.getAttribute("data-hwdel");state.hw=state.hw.filter(function(h){return h.id!==id});save();render()}
+else if(b.hasAttribute("data-hwclear")){state.hw=state.hw.filter(function(h){return !h.done});save();render()}});
+box.addEventListener("keydown",function(e){if(e.key!=="Enter")return;var t=e.target;
+if(t.hasAttribute&&t.hasAttribute("data-hwin")){e.preventDefault();addHw(t.getAttribute("data-hwin"),t.value,t.getAttribute("data-d"))}
+else if(t.id==="hw_t"){e.preventDefault();addHw(document.getElementById("hw_c").value,t.value)}})}
+function renderHw(){var V=document.getElementById("v_hw"),all={},ticked=[];
+[1,2].forEach(function(n){state.s[n].forEach(function(c){all[cidOf(c)]=c;if(c.on)ticked.push(c)})});
+var pool=ticked.length?ticked:Object.keys(all).map(function(k){return all[k]}),open=(state.hw||[]).filter(function(h){return !h.done}),done=(state.hw||[]).filter(function(h){return h.done});
+var groups={};open.forEach(function(h){(groups[h.cid]=groups[h.cid]||[]).push(h)});
+var h='<div class="hero"><div class="h1">Homework</div><div class="h2">Checklist from your classes</div><div class="hs">'+(open.length?open.length+' to do':'All caught up')+'</div></div>';
+h+='<div class="card"><div class="hwh">Add an item</div><div class="hwadd" style="flex-wrap:wrap"><select id="hw_c" style="flex:1 1 100%">'+pool.map(function(c){return '<option value="'+cidOf(c)+'">'+esc(c.n)+'</option>'}).join("")+'</select><input id="hw_t" placeholder="What do you need to do?" maxlength="160"><button data-hwadd2="1">Add</button></div></div>';
+var ids=Object.keys(groups).sort(function(a,b){return ((all[a]||{n:"~"}).n).localeCompare((all[b]||{n:"~"}).n)});
+if(!ids.length)h+='<div class="card"><b>Nothing to do</b><div class="sub" style="margin:6px 0 0">Add homework above, or right from a class on the Today screen.</div></div>';
+ids.forEach(function(id){var c=all[id];h+='<div class="card hwg"><h3><i style="background:'+(c?TC[tg(c)]:"#888")+'"></i>'+esc(c?c.n:"(removed course)")+'</h3>'+groups[id].map(function(x){return '<label class="hwi"><input type="checkbox" data-hw="'+x.id+'"><span>'+esc(x.t)+'<small>from '+(x.d?fs(x.d):"")+'</small></span><button class="hx" data-hwdel="'+x.id+'" aria-label="Delete">×</button></label>'}).join("")+'</div>'});
+if(done.length)h+='<details class="card"><summary style="cursor:pointer;font-weight:600">Done ('+done.length+')</summary><div style="margin-top:8px">'+done.map(function(x){var c=all[x.cid];return '<label class="hwi done"><input type="checkbox" checked data-hw="'+x.id+'"><span>'+esc(x.t)+'<small>'+esc(c?c.n:"(removed course)")+'</small></span></label>'}).join("")+'</div><button data-hwclear="1" style="margin-top:10px">Clear done items</button></details>';
+V.innerHTML=h}
 function renderToday(){var V=document.getElementById("v_today"),now=new Date(),td=iso(now),nowM=now.getHours()*60+now.getMinutes();
 var wk=tmode==="week",ws=wk?addD(tdate,-wd(tdate)):tdate;
 var sum="",FN=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
@@ -353,11 +387,11 @@ document.getElementById("s_campus").onchange=function(){state.campus=this.value.
 document.getElementById("s_tm").onchange=function(){state.travel=this.value;save();render()};
 V.querySelectorAll("[data-s]").forEach(function(el){el.onchange=function(){var k=el.getAttribute("data-s");state.sem[+k[0]][k[1]]=el.value;save();render()}})}
 function showNav(){var N=document.getElementById("nav");N.innerHTML="";
-var IC={today:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',plan:'<rect x="3" y="4" width="18" height="17" rx="3"/><path d="M3 9h18M8 2v4M16 2v4"/>',set:'<path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/>'};
-[["today","Today"],["plan","Planner"],["set","Settings"]].forEach(function(t){var b=document.createElement("button");b.className=state.nav===t[0]?"on":"";
-b.innerHTML='<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+IC[t[0]]+'</svg>'+t[1];b.onclick=function(){state.nav=t[0];render();window.scrollTo(0,0)};N.appendChild(b)});
-["today","plan","set"].forEach(function(k){document.getElementById("v_"+k).hidden=state.nav!==k})}
-function render(){renderPlan();renderToday();renderSet();showNav();updDirty()}
+var IC={hw:'<path d="M9 6h11M9 12h11M9 18h11"/><path d="M3.5 6l1.5 1.5L7 5M3.5 12l1.5 1.5L7 11M3.5 18l1.5 1.5L7 17"/>',today:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',plan:'<rect x="3" y="4" width="18" height="17" rx="3"/><path d="M3 9h18M8 2v4M16 2v4"/>',set:'<path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/>'};
+[["today","Today"],["hw","Homework"],["plan","Planner"],["set","Settings"]].forEach(function(t){var b=document.createElement("button");b.className=state.nav===t[0]?"on":"";
+b.innerHTML='<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+IC[t[0]]+'</svg>'+t[1]+(t[0]==="hw"&&nOpen()?'<span class="bg">'+nOpen()+'</span>':'');b.onclick=function(){state.nav=t[0];render();window.scrollTo(0,0)};N.appendChild(b)});
+["today","hw","plan","set"].forEach(function(k){document.getElementById("v_"+k).hidden=state.nav!==k})}
+function render(){renderPlan();renderToday();renderHw();renderSet();showNav();updDirty()}
 function secs(){return [].slice.call(document.querySelectorAll("#secs>.card"))}
 function saveUI(){try{localStorage.setItem("plannerUI",JSON.stringify(state.layout))}catch(e){}}
 function saveOrder(){state.layout.order=secs().map(function(c){return c.getAttribute("data-sec")});saveUI()}
@@ -409,6 +443,7 @@ var inf={},any=false;INF.forEach(function(f){var t=document.getElementById('ai_'
 state.s[sem].push(o);["a_name","a_code","a_lec","a_room","a_loc","a_notes","a_dates","a_ds","a_de"].forEach(function(id){document.getElementById(id).value=""});
 msg.textContent='Added "'+n+'" to Semester '+sem+'.';state.cur=sem;courses=state.s[sem];save();render()};
 try{var uiL=JSON.parse(localStorage.getItem("plannerUI")||"null");if(uiL&&uiL.order){if(!uiL.col)uiL.col={};state.layout=uiL}}catch(e){}
+hwEvents(document.getElementById("v_today"));hwEvents(document.getElementById("v_hw"));
 initSecs();applyLayout();
 render();
 if("serviceWorker" in navigator&&/^https?:/.test(location.protocol))window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){})});
