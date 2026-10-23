@@ -1,5 +1,5 @@
 // Offline support: the app shell is cached; HTML is fetched fresh when online so updates arrive.
-const V = "planner-v8";
+const V = "planner-v9";
 const CORE = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-maskable-512.png"];
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(V).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));

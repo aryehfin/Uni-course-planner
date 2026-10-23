@@ -71,6 +71,9 @@ a.dir.async{background:#8b5cf6;color:#fff}
 .fmt{display:flex;align-items:center;gap:6px;margin-top:10px;flex-wrap:wrap;font-size:12px;color:var(--mu)}.fmt button{border-radius:99px;padding:6px 13px;font-size:13px;font-weight:600;min-height:36px;background:var(--bg)}.fmt button.on{background:var(--tx);color:var(--bg);border-color:var(--tx)}.fmt button.on[data-fmt=zoom]{background:#2d8cff;color:#fff;border-color:#2d8cff}.fmt button.on[data-fmt=async]{background:#8b5cf6;color:#fff;border-color:#8b5cf6}
 .sw{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 0;border-top:1px solid var(--ln);font-size:15px}
 .sw input{appearance:none;-webkit-appearance:none;width:50px;height:30px;border-radius:99px;background:var(--ln);position:relative;border:0;flex:none;padding:0;transition:background .15s}.sw input::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:transform .15s}.sw input:checked{background:var(--ac)}.sw input:checked::after{transform:translateX(20px)}
+.ev{position:relative}.ev .nm{padding-right:36px}
+.edbtn{position:absolute;top:6px;right:6px;width:40px;height:40px;border:0;background:none;color:var(--mu);border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0}.edbtn.on{color:#e0a800}.edbtn:active{background:var(--soft)}
+.edf{margin-top:6px}.edf .setl{margin-bottom:10px}.edbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.edbar button{min-height:44px;padding:0 18px;border-radius:99px;font-weight:600}
 .hero{background:var(--ac);color:var(--on);border-radius:20px;padding:18px 20px;margin-bottom:12px}.hero .h1{font:700 30px/1.05 var(--f1);letter-spacing:-.02em}.hero .h2{font-size:16px;margin-top:4px;opacity:.85}.hero .hs{font-size:14px;margin-top:10px;font-weight:600}
 .dh{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}.dh input{min-height:44px;flex:1 1 130px}
 .grp{display:inline-flex;border:1px solid var(--ln);border-radius:99px;overflow:hidden;background:var(--card)}.grp button{border:0;border-radius:0;background:none;padding:0 15px;min-height:44px;font-weight:600}.grp button.on{background:var(--ac);color:var(--on)}
@@ -151,7 +154,7 @@ return {x:x,s:to24(r[7]||""),e:to24(r[8]||"")}}
 var state={cur:1,s:{1:DEF,2:[]},goal:14},dirty=false,migrated=false;
 try{var el0=document.getElementById("plannerData"),tx0=((el0&&el0.textContent)||"").trim(),emb=tx0?JSON.parse(tx0):null,pv=localStorage.getItem("plannerPWA");
 if(pv)state=JSON.parse(pv);else if(emb)state=emb}catch(e){}
-function norm(){if(!state.goal)state.goal=14;if(!state.off)state.off=[];if(!state.hw)state.hw=[];if(!state.layout)state.layout={order:[],col:{}};
+function norm(){if(!state.goal)state.goal=14;if(!state.ov)state.ov={};if(!state.off)state.off=[];if(!state.hw)state.hw=[];if(!state.layout)state.layout={order:[],col:{}};
 if(!state.sem)state.sem={1:{a:"2026-10-18",b:"2027-01-29"},2:{a:"2027-03-14",b:"2027-07-02"}};
 if(!state.nav)state.nav="today";if(state.campus==null)state.campus="";
 if(!state.seed2){if(!state.s[2]||!state.s[2].length)state.s[2]=DEF2;state.seed2=1}
@@ -333,19 +336,19 @@ function occ(c,n,ds){if(c.d<0||wd(ds)!==c.d||offInfo(ds))return false;var S=stat
 if(a&&ds<a)return false;if(b&&ds>b)return false;if((c.sk||[]).indexOf(ds)>=0)return false;
 var iv=c.iv||1;if(iv>1&&a){var s0=addD(a,(c.d-wd(a)+7)%7);if(dd(s0,ds)/7%iv!==0)return false}return true}
 function evsOn(ds){var out=[];[1,2].forEach(function(n){state.s[n].forEach(function(c){if(!c.on)return;
-if(isW(c)){ses(c).forEach(function(x){if(x.x===ds){var o=zt(c,ds),y=o?{s:o.s,e:o.e}:x,r=rng(y);out.push({c:c,a:r[0],b:r[1],s:y.s,e:y.e,tm:y.s?r12(y.s,y.e):"All day (time TBC)"})}})}
-else if(occ(c,n,ds)){var o=zt(c,ds),s0=o?o.s:c.s,e0=o?o.e:c.e;out.push({c:c,a:m(s0),b:m(e0),s:s0,e:e0,tm:r12(s0,e0)})}})});
+if(isW(c)){ses(c).forEach(function(x){if(x.x===ds){var o=zt(c,ds),y=o?{s:o.s,e:o.e}:x,v0=ovOf(c,ds);if(v0&&v0.s)y={s:v0.s,e:v0.e};var r=rng(y);out.push({c:c,a:r[0],b:r[1],s:y.s,e:y.e,tm:y.s?r12(y.s,y.e):"All day (time TBC)"})}})}
+else if(occ(c,n,ds)){var o=zt(c,ds),s0=o?o.s:c.s,e0=o?o.e:c.e,v1=ovOf(c,ds);if(v1&&v1.s){s0=v1.s;e0=v1.e}out.push({c:c,a:m(s0),b:m(e0),s:s0,e:e0,tm:r12(s0,e0)})}})});
 out.sort(function(x,y){return x.a-y.a||x.b-y.b});
 out.forEach(function(X){X.cl=modeOf(X.c,ds)!=="async"&&out.some(function(Y){return Y!==X&&modeOf(Y.c,ds)!=="async"&&ov([X.a,X.b],[Y.a,Y.b])})});return out}
-function mapUrl(c){var u=(c.map||"").trim();if(/^https?:\/\//i.test(u))return u;var q=(c.loc||"").trim();if(!q)return "";
+function mapUrl(c,ds){var v=ds?ovOf(c,ds):null,own=v&&v.loc!=null,u=(c.map||"").trim();if(!own&&/^https?:\/\//i.test(u))return u;var q=(own?v.loc:(c.loc||"")).trim();if(!q)return "";
 return "https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(q+(state.campus?", "+state.campus:""))+"&travelmode="+(state.travel||"walking")}
 function evCard(X,ds,st){var c=X.c,col=TC[tg(c)],tdy=ds===st.td,ad=!X.s,
-past=tdy&&X.b<=st.now&&!ad,now=tdy&&st.now>=X.a&&st.now<X.b&&!ad,nxt=tdy&&X===st.next,url=mapUrl(c),md=modeOf(c,ds);
+past=tdy&&X.b<=st.now&&!ad,now=tdy&&st.now>=X.a&&st.now<X.b&&!ad,nxt=tdy&&X===st.next,url=mapUrl(c,ds),md=modeOf(c,ds),ov=ovOf(c,ds),edOpen=edKey===cidOf(c)+"|"+ds;
 var det=INF.filter(function(f){return c.inf&&(c.inf[f[0]]||"").trim()}).map(function(f){return '<div class="mt"><b>'+f[1]+':</b> '+esc(c.inf[f[0]]).replace(/\n/g,"<br>")+'</div>'}).join("");
-return '<div class="ev'+(X.cl?' cl':'')+(past?' past':'')+(now?' now':'')+(md!=="person"?' md-'+md:'')+'" style="--tc:'+(X.cl?'var(--bad)':md==="zoom"?'#2d8cff':md==="async"?'#8b5cf6':col)+'"><div class="tcol">'+(ad?'<div class="t1 ad">All day</div><div class="t2">time TBC</div>':'<div class="t1">'+f12h(X.s)+'</div><div class="t2">'+f12(X.e)+'</div>')+'</div><div class="eb">'+modeBanner(md)+'<div class="nm">'+(X.cl?"⚠ ":"")+(star(c)?"★ ":"")+esc(c.n)+(now?'<span class="bdg now">Now</span>':nxt?'<span class="bdg nxt">Next</span>':'')+'</div><div class="mt"><span class="tag" style="--tc:'+col+'">'+TN[tg(c)]+(isW(c)?" · by date":"")+'</span>'+esc([c.r,c.nt].filter(Boolean).join(" · "))+'</div>'
-+(X.cl?'<div class="mt bd">Overlaps with another class this day</div>':'')
-+(md==="zoom"?zoomBtn(c):md==="async"?asyncBtn(c):url?'<a class="dir" href="'+esc(url)+'" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11a7 7 0 10-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>Directions</a>':'<div class="mt">No building set. Add one under ⓘ in the Planner to get a map link.</div>')
-+zoomToggle(c,ds)+hwSection(c,ds,past)+(det?'<details><summary>More info</summary>'+det+'</details>':'')+'</div></div>'}
+return '<div class="ev'+(X.cl?' cl':'')+(past?' past':'')+(now?' now':'')+(md!=="person"?' md-'+md:'')+'" style="--tc:'+(X.cl?'var(--bad)':md==="zoom"?'#2d8cff':md==="async"?'#8b5cf6':col)+'">'+edBtn(c,ds,ov)+'<div class="tcol">'+(ad?'<div class="t1 ad">All day</div><div class="t2">time TBC</div>':'<div class="t1">'+f12h(X.s)+'</div><div class="t2">'+f12(X.e)+'</div>')+'</div><div class="eb">'+modeBanner(md)+'<div class="nm">'+(X.cl?"⚠ ":"")+(star(c)?"★ ":"")+esc(c.n)+(now?'<span class="bdg now">Now</span>':nxt?'<span class="bdg nxt">Next</span>':'')+'</div><div class="mt"><span class="tag" style="--tc:'+col+'">'+TN[tg(c)]+(isW(c)?" · by date":"")+'</span>'+(ov?'<span class="tag" style="--tc:#e0a800">Edited</span>':'')+esc([ov&&ov.r!=null?ov.r:c.r,ov&&ov.nt!=null?ov.nt:c.nt].filter(Boolean).join(" · "))+'</div>'
++(edOpen?edForm(c,ds,X):(''+(X.cl?'<div class="mt bd">Overlaps with another class this day</div>':'')
++(md==="zoom"?zoomBtn(c,ds):md==="async"?asyncBtn(c,ds):url?'<a class="dir" href="'+esc(url)+'" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11a7 7 0 10-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>Directions</a>':'<div class="mt">No building set. Add one under ⓘ in the Planner to get a map link.</div>')
++zoomToggle(c,ds)+hwSection(c,ds,past)+(det?'<details><summary>More info</summary>'+det+'</details>':'')))+'</div></div>'}
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
 function cidOf(c){return c.id||(c.id=uid())}
 function nOpen(){return (state.hw||[]).filter(function(h){return !h.done}).length}
@@ -353,15 +356,30 @@ function zEntry(c,ds){return (c.zd||[]).find(function(z){return (typeof z==="str
 function zt(c,ds){var z=zEntry(c,ds);return z&&typeof z!=="string"&&z.s?z:null}
 function isOnline(c,ds){return !!c.zall||!!zEntry(c,ds)}
 function aEntry(c,ds){return (c.ad||[]).find(function(z){return (typeof z==="string"?z:z.x)===ds})}
-function modeOf(c,ds){return (c.aall||aEntry(c,ds))?"async":(c.zall||zEntry(c,ds))?"zoom":"person"}
+var edKey=null;
+function ovOf(c,ds){return (state.ov||{})[cidOf(c)+"|"+ds]||null}
+function modeOf(c,ds,nv){var v=nv?null:ovOf(c,ds);if(v&&v.fmt)return v.fmt;return (c.aall||aEntry(c,ds))?"async":(c.zall||zEntry(c,ds))?"zoom":"person"}
+function baseTimes(c,ds){var z=zt(c,ds);if(z)return {s:z.s,e:z.e};if(isW(c)){var x=ses(c).find(function(q){return q.x===ds});return {s:x?x.s:"",e:x?x.e:""}}return {s:c.s,e:c.e}}
+var EDI='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>';
+function edBtn(c,ds,has){return '<button class="edbtn'+(has?' on':'')+'" data-edit="'+cidOf(c)+'|'+ds+'" aria-label="Edit this class" title="Edit this class only">'+EDI+'</button>'}
+function edForm(c,ds,X){var key=cidOf(c)+"|"+ds,v=ovOf(c,ds)||{},md=modeOf(c,ds),F=function(k,b){return esc(v[k]!=null?v[k]:(b||""))};
+return '<div class="edf"><div class="sub" style="margin:2px 0 10px">Changes here apply to this class on <b>'+fmt(ds)+'</b> only.</div>'
++'<div class="two"><label class="setl">Start<input type="time" data-ef="s" value="'+(X.s||"")+'"></label><label class="setl">End<input type="time" data-ef="e" value="'+(X.e||"")+'"></label></div>'
++'<label class="setl">Format<select data-ef="fmt"><option value="person"'+(md==="person"?' selected':'')+'>In person</option><option value="zoom"'+(md==="zoom"?' selected':'')+'>Zoom</option><option value="async"'+(md==="async"?' selected':'')+'>Asynchronous (recording)</option></select></label>'
++'<label class="setl">Building for map link<input data-ef="loc" value="'+F("loc",c.loc)+'"></label>'
++'<label class="setl">Lecturer / room shown on the card<input data-ef="r" value="'+F("r",c.r)+'"></label>'
++'<label class="setl">Zoom link<input data-ef="zl" value="'+F("zl",c.zl)+'" placeholder="Used when the format is Zoom"></label>'
++'<label class="setl">Recording link<input data-ef="al" value="'+F("al",c.al)+'" placeholder="Used when the format is Asynchronous"></label>'
++'<label class="setl">Note for this class<input data-ef="nt" value="'+F("nt",c.nt)+'" placeholder="e.g. Bring your laptop"></label>'
++'<div class="edmsg sub" style="color:var(--bad);margin:0"></div><div class="edbar"><button class="prim" data-edsave="'+key+'">Save</button><button data-edcancel="1">Cancel</button>'+(Object.keys(v).length?'<button data-edreset="'+key+'">Reset to normal</button>':'')+'</div></div>'}
 function modeBanner(md){if(md==="zoom")return '<div class="mode zoom"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h11a2 2 0 012 2v6a2 2 0 01-2 2H3z"/><path d="M16 11l5-3v8l-5-3z"/></svg>Zoom · Online</div>';
 if(md==="async")return '<div class="mode async"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M10 8.5l5.5 3.5-5.5 3.5z" fill="currentColor"/></svg>Asynchronous · Recording</div>';return ""}
-function asyncBtn(c){var u=(c.al||"").trim();if(u&&!/^https?:\/\//i.test(u)&&/\./.test(u))u="https://"+u;
+function asyncBtn(c,ds){var v=ds?ovOf(c,ds):null,u=((v&&v.al)||c.al||"").trim();if(u&&!/^https?:\/\//i.test(u)&&/\./.test(u))u="https://"+u;
 return /^https?:\/\//i.test(u)?'<a class="dir async" href="'+esc(u)+'" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M10 8.5l5.5 3.5-5.5 3.5z" fill="currentColor"/></svg>Watch recording</a>':'<div class="mt">Watch the recording on your own time. Add the link under ⓘ in the Planner.</div>'}
 function fmtControl(c,ds){if(c.zall||c.aall)return "";var zOn=!state.noZoomBtn,aOn=!state.noAsyncBtn,md=modeOf(c,ds);if(!zOn&&!aOn)return "";
 var o=[["person","In person"]];if(zOn||md==="zoom")o.push(["zoom","Zoom"]);if(aOn||md==="async")o.push(["async","Async"]);if(o.length<2)return "";
 return '<div class="fmt" role="group" aria-label="Class format"><span>This class:</span>'+o.map(function(x){return '<button data-fmt="'+x[0]+'" data-cid="'+cidOf(c)+'" data-d="'+ds+'" class="'+(md===x[0]?'on':'')+'">'+x[1]+'</button>'}).join("")+'</div>'}
-function zoomBtn(c){var u=(c.zl||"").trim();if(u&&!/^https?:\/\//i.test(u)&&/\./.test(u))u="https://"+u;
+function zoomBtn(c,ds){var v=ds?ovOf(c,ds):null,u=((v&&v.zl)||c.zl||"").trim();if(u&&!/^https?:\/\//i.test(u)&&/\./.test(u))u="https://"+u;
 return /^https?:\/\//i.test(u)?'<a class="dir zoom" href="'+esc(u)+'" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h11a2 2 0 012 2v6a2 2 0 01-2 2H3z"/><path d="M16 11l5-3v8l-5-3z"/></svg>Join Zoom</a>':'<div class="mt">Online class. Add the Zoom link under ⓘ in the Planner.</div>'}
 function zoomToggle(c,ds){return fmtControl(c,ds)}
 function hwSection(c,ds,past){var id=cidOf(c),items=(state.hw||[]).filter(function(h){return h.cid===id&&!h.done});
@@ -375,7 +393,20 @@ if(b.hasAttribute("data-hwadd")){addHw(b.getAttribute("data-hwadd"),b.previousEl
 else if(b.hasAttribute("data-hwadd2")){addHw(document.getElementById("hw_c").value,document.getElementById("hw_t").value)}
 else if(b.hasAttribute("data-zoom")){var zid=b.getAttribute("data-zoom"),zds=b.getAttribute("data-d");[1,2].forEach(function(n){state.s[n].forEach(function(c){if(cidOf(c)===zid){c.zd=c.zd||[];var k=-1;c.zd.forEach(function(z,j){if((typeof z==="string"?z:z.x)===zds)k=j});if(k>=0)c.zd.splice(k,1);else c.zd.push(zds)}})});save();render()}
 else if(b.hasAttribute("data-fmt")){var fid=b.getAttribute("data-cid"),fd=b.getAttribute("data-d"),fm=b.getAttribute("data-fmt");
-[1,2].forEach(function(n){state.s[n].forEach(function(c){if(cidOf(c)!==fid)return;["zd","ad"].forEach(function(k){c[k]=(c[k]||[]).filter(function(z){return (typeof z==="string"?z:z.x)!==fd})});if(fm==="zoom")c.zd.push(fd);else if(fm==="async")c.ad.push(fd)})});save();render()}
+[1,2].forEach(function(n){state.s[n].forEach(function(c){if(cidOf(c)!==fid)return;var ok2=fid+"|"+fd;if(state.ov&&state.ov[ok2]&&state.ov[ok2].fmt){delete state.ov[ok2].fmt;if(!Object.keys(state.ov[ok2]).length)delete state.ov[ok2]}["zd","ad"].forEach(function(k){c[k]=(c[k]||[]).filter(function(z){return (typeof z==="string"?z:z.x)!==fd})});if(fm==="zoom")c.zd.push(fd);else if(fm==="async")c.ad.push(fd)})});save();render()}
+else if(b.hasAttribute("data-edit")){var k0=b.getAttribute("data-edit");edKey=edKey===k0?null:k0;renderToday()}
+else if(b.hasAttribute("data-edcancel")){edKey=null;renderToday()}
+else if(b.hasAttribute("data-edreset")){delete state.ov[b.getAttribute("data-edreset")];edKey=null;save();render()}
+else if(b.hasAttribute("data-edsave")){var key=b.getAttribute("data-edsave"),pt=key.split("|"),cc=null,card=b.closest(".ev"),msg=card.querySelector(".edmsg");
+[1,2].forEach(function(n){state.s[n].forEach(function(c){if(cidOf(c)===pt[0])cc=c})});
+var g=function(n){var el=card.querySelector('[data-ef="'+n+'"]');return el?el.value.trim():""},s1=g("s"),e1=g("e");
+if(!!s1!==!!e1){msg.textContent="Enter both a start and an end time, or leave both blank.";return}
+if(s1&&m(e1)<=m(s1)){msg.textContent="The end time must be after the start time.";return}
+if(cc){var base=baseTimes(cc,pt[1]),o={};if(s1&&(s1!==base.s||e1!==base.e)){o.s=s1;o.e=e1}
+if(g("fmt")!==modeOf(cc,pt[1],true))o.fmt=g("fmt");
+[["loc",cc.loc],["r",cc.r],["zl",cc.zl],["al",cc.al],["nt",cc.nt]].forEach(function(q){if(g(q[0])!==(q[1]||"").trim())o[q[0]]=g(q[0])});
+if(Object.keys(o).length)state.ov[key]=o;else delete state.ov[key]}
+edKey=null;save();render()}
 else if(b.hasAttribute("data-hwdel")){var id=b.getAttribute("data-hwdel");state.hw=state.hw.filter(function(h){return h.id!==id});save();render()}
 else if(b.hasAttribute("data-hwclear")){state.hw=state.hw.filter(function(h){return !h.done});save();render()}});
 box.addEventListener("keydown",function(e){if(e.key!=="Enter")return;var t=e.target;
