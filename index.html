@@ -376,10 +376,18 @@ function dueCard(ds,td){var r=dueRows(ds);return r?'<div class="card cu due"><di
 function comingUp(vd){var td=iso(new Date()),lim=addD(td,7),L=(state.dl||[]).filter(function(d){return !d.done&&d.d<=lim&&d.d!==vd}).sort(cmpDl);if(!L.length)return "";
 return '<div class="card cu"><div class="hwh">Coming up</div>'+L.slice(0,5).map(function(d){var c=courseById(d.cid),late=d.d<td;return '<label class="hwi"><input type="checkbox" data-dl="'+d.id+'"><span><span class="tag" style="--tc:'+DLC[d.type]+'">'+DLN2[d.type]+'</span>'+esc(d.t)+'<small>'+esc(c?c.n:"")+' · <b'+(late?' style="color:var(--bad)"':'')+'>'+(late?'Overdue · ':'')+relTxt(d.d,td)+(d.s?' · '+f12(d.s):'')+'</b></small></span></label>'}).join("")
 +'<button class="lnk" data-dlgo="1">'+(L.length>5?'See all '+L.length+' deadlines':'Open deadlines')+'</button></div>'}
-function hwSwitch(){var n=(state.dl||[]).filter(function(d){return !d.done}).length;return '<div class="grp" style="margin-bottom:12px"><button data-hwv="todo" class="'+(hwView==="todo"?'on':'')+'">To-do</button><button data-hwv="dl" class="'+(hwView==="dl"?'on':'')+'">Deadlines'+(n?' ('+n+')':'')+'</button></div>'}
+var hwSem=0;
+function hwS(){if(hwSem)return hwSem;var td=iso(new Date()),S=state.sem||{};return (S[1]&&S[1].b)?(td<=S[1].b?1:2):(state.cur||1)}
+function cSem(cid){var r=0;[1,2].forEach(function(n){state.s[n].forEach(function(c){if(c.id===cid)r=n})});return r}
+function inSem(h,hs){var n=cSem(h.cid);return n===hs||n===0}
+function hwSwitch(){var hs=hwS(),cnt={1:0,2:0};
+(state.hw||[]).concat(state.dl||[]).forEach(function(h){if(!h.done){var n=cSem(h.cid);if(n)cnt[n]++}});
+var nd=(state.dl||[]).filter(function(d){return !d.done&&inSem(d,hs)}).length;
+return '<div style="margin-bottom:10px"><div class="grp">'+[1,2].map(function(n){return '<button data-hws="'+n+'" class="'+(hs===n?'on':'')+'">Semester '+n+(cnt[n]?' ('+cnt[n]+')':'')+'</button>'}).join("")+'</div></div>'
++'<div class="grp" style="margin-bottom:12px"><button data-hwv="todo" class="'+(hwView==="todo"?'on':'')+'">To-do</button><button data-hwv="dl" class="'+(hwView==="dl"?'on':'')+'">Deadlines'+(nd?' ('+nd+')':'')+'</button></div>'}
 function dlRow(d,td){var c=courseById(d.cid),late=!d.done&&d.d<td;return '<div class="dlr'+(d.done?' done':'')+(late?' late':'')+'"><input type="checkbox" data-dl="'+d.id+'"'+(d.done?' checked':'')+'><div class="dlb"><div class="dlt"><span class="tag" style="--tc:'+DLC[d.type]+'">'+DLN2[d.type]+'</span>'+esc(d.t)+'</div><div class="mt">'+esc(c?c.n:"(removed course)")+(d.w?' · '+esc(d.w):'')+'</div><div class="mt">'+fmt(d.d)+(d.s?' · '+r12(d.s,d.e):'')+' · <b class="rel">'+(late?'Overdue · ':'')+relTxt(d.d,td)+'</b>'+(d.loc?' · '+esc(d.loc):'')+'</div></div><button class="hx" data-dledit="'+d.id+'" aria-label="Edit">✎</button><button class="hx" data-dldel="'+d.id+'" aria-label="Delete">×</button></div>'}
-function renderDl(){var V=document.getElementById("v_hw"),td=iso(new Date()),all=[];[1,2].forEach(function(n){state.s[n].forEach(function(c){all.push(c)})});
-var open=(state.dl||[]).filter(function(d){return !d.done}).sort(cmpDl),done=(state.dl||[]).filter(function(d){return d.done}).sort(function(a,b){return cmpDl(b,a)}),lim=addD(td,7);
+function renderDl(){var V=document.getElementById("v_hw"),td=iso(new Date()),all=[],hs=hwS();state.s[hs].forEach(function(c){all.push(c)});
+var open=(state.dl||[]).filter(function(d){return !d.done&&inSem(d,hs)}).sort(cmpDl),done=(state.dl||[]).filter(function(d){return d.done&&inSem(d,hs)}).sort(function(a,b){return cmpDl(b,a)}),lim=addD(td,7);
 var late=open.filter(function(d){return d.d<td}),soon=open.filter(function(d){return d.d>=td&&d.d<=lim}),later=open.filter(function(d){return d.d>lim});
 var ed=dlEditId?(state.dl||[]).find(function(x){return x.id===dlEditId}):null;if(dlEditId&&!ed)dlEditId=null;
 var val=function(k){return ed&&ed[k]!=null?esc(ed[k]):""};
@@ -463,6 +471,7 @@ if(g("fmt")!==modeOf(cc,pt[1],true))o.fmt=g("fmt");
 [["loc",cc.loc],["r",cc.r],["zl",cc.zl],["al",cc.al],["nt",cc.nt]].forEach(function(q){if(g(q[0])!==(q[1]||"").trim())o[q[0]]=g(q[0])});
 if(Object.keys(o).length)state.ov[key]=o;else delete state.ov[key]}
 edKey=null;save();render()}
+else if(b.hasAttribute("data-hws")){hwSem=+b.getAttribute("data-hws");dlEditId=null;renderHw()}
 else if(b.hasAttribute("data-hwv")){hwView=b.getAttribute("data-hwv");renderHw()}
 else if(b.hasAttribute("data-dlgo")){state.nav="hw";hwView="dl";render();window.scrollTo(0,0)}
 else if(b.hasAttribute("data-dledit")){dlEditId=b.getAttribute("data-dledit");renderHw();var fm=document.getElementById("dl_form");if(fm&&fm.scrollIntoView)fm.scrollIntoView({block:"start"})}
@@ -479,9 +488,9 @@ else if(b.hasAttribute("data-hwclear")){state.hw=state.hw.filter(function(h){ret
 box.addEventListener("keydown",function(e){if(e.key!=="Enter")return;var t=e.target;
 if(t.hasAttribute&&t.hasAttribute("data-hwin")){e.preventDefault();addHw(t.getAttribute("data-hwin"),t.value,t.getAttribute("data-d"))}
 else if(t.id==="hw_t"){e.preventDefault();addHw(document.getElementById("hw_c").value,t.value)}})}
-function renderHw(){if(hwView==="dl"){renderDl();return}var V=document.getElementById("v_hw"),all={},ticked=[];
-[1,2].forEach(function(n){state.s[n].forEach(function(c){all[cidOf(c)]=c;if(c.on)ticked.push(c)})});
-var pool=ticked.length?ticked:Object.keys(all).map(function(k){return all[k]}),open=(state.hw||[]).filter(function(h){return !h.done}),done=(state.hw||[]).filter(function(h){return h.done});
+function renderHw(){if(hwView==="dl"){renderDl();return}var V=document.getElementById("v_hw"),all={},ticked=[],hs=hwS();
+[1,2].forEach(function(n){state.s[n].forEach(function(c){all[cidOf(c)]=c;if(c.on&&n===hs)ticked.push(c)})});
+var pool=ticked.length?ticked:state.s[hs].slice(),open=(state.hw||[]).filter(function(h){return !h.done&&inSem(h,hs)}),done=(state.hw||[]).filter(function(h){return h.done&&inSem(h,hs)});
 var groups={};open.forEach(function(h){(groups[h.cid]=groups[h.cid]||[]).push(h)});
 var h='<div class="hero"><div class="h1">Homework</div><div class="h2">Checklist from your classes</div><div class="hs">'+(open.length?open.length+' to do':'All caught up')+'</div></div>';
 h+=hwSwitch();h+='<div class="card"><div class="hwh">Add an item</div><div class="hwadd" style="flex-wrap:wrap"><select id="hw_c" style="flex:1 1 100%">'+pool.map(function(c){return '<option value="'+cidOf(c)+'">'+esc(c.n)+'</option>'}).join("")+'</select><input id="hw_t" placeholder="What do you need to do?" maxlength="160"><button data-hwadd2="1">Add</button></div></div>';
